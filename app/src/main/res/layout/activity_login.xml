@@ -31,8 +31,6 @@
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:alpha="0"
-        tools:alpha="100"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -47,8 +45,6 @@
         android:text="@string/message_login_page"
         android:textColor="@color/black"
         android:textSize="16sp"
-        android:alpha="0"
-        tools:alpha="100"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -62,8 +58,6 @@
         android:layout_marginTop="24dp"
         android:text="@string/email"
         android:textColor="@color/black"
-        android:alpha="0"
-        tools:alpha="100"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/messageTextView" />
 
@@ -74,8 +68,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
-        android:alpha="0"
-        tools:alpha="100"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/emailTextView"
@@ -98,8 +90,6 @@
         android:layout_marginTop="8dp"
         android:text="@string/password"
         android:textColor="@color/black"
-        android:alpha="0"
-        tools:alpha="100"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/emailEditTextLayout" />
 
@@ -111,8 +101,6 @@
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         app:endIconMode="password_toggle"
-        android:alpha="0"
-        tools:alpha="100"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/passwordTextView"
@@ -136,8 +124,6 @@
         android:layout_marginEnd="32dp"
         android:backgroundTint="@color/light_primary_variant"
         android:text="@string/login"
-        android:alpha="0"
-        tools:alpha="100"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/passwordEditTextLayout" />
@@ -155,11 +141,13 @@
             android:layout_height="wrap_content"
             android:text="@string/to_register"
             android:layout_marginEnd="5dp"/>
+
         <TextView
+            android:id="@+id/to_register"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/register"
-            android:textColor="@color/blue_click"/>
+            android:textColor="@color/blue_click" />
     </LinearLayout>
 
     <androidx.constraintlayout.widget.Guideline

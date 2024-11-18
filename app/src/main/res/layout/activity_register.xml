@@ -31,8 +31,6 @@
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:alpha="0"
-        tools:alpha="100"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,8 +44,6 @@
         android:layout_marginTop="8dp"
         android:text="@string/username"
         android:textColor="@color/black"
-        android:alpha="0"
-        tools:alpha="100"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/titleTextView" />
 
@@ -58,8 +54,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
-        android:alpha="0"
-        tools:alpha="100"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nameTextView"
@@ -81,8 +75,6 @@
         android:layout_marginTop="16dp"
         android:text="@string/email"
         android:textColor="@color/black"
-        android:alpha="0"
-        tools:alpha="100"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nameEditTextLayout" />
 
@@ -93,8 +85,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
-        android:alpha="0"
-        tools:alpha="100"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/emailTextView"
@@ -116,8 +106,6 @@
         android:layout_marginTop="8dp"
         android:text="@string/password"
         android:textColor="@color/black"
-        android:alpha="0"
-        tools:alpha="100"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/emailEditTextLayout" />
 
@@ -129,8 +117,6 @@
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         app:endIconMode="password_toggle"
-        android:alpha="0"
-        tools:alpha="100"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/passwordTextView"
@@ -145,7 +131,7 @@
     </com.capstone.skinory.ui.customview.PasswordInputLayout>
 
     <Button
-        android:id="@+id/signupButton"
+        android:id="@+id/registerButton"
         android:layout_width="0dp"
         android:layout_height="64dp"
         android:layout_marginStart="32dp"
@@ -153,8 +139,6 @@
         android:layout_marginEnd="32dp"
         android:backgroundTint="@color/light_primary_variant"
         android:text="@string/register"
-        android:alpha="0"
-        tools:alpha="100"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/passwordEditTextLayout" />
