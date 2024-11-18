@@ -10,3 +10,9 @@ data class RegisterResponse(
     @field:SerializedName("message")
     val message: String? = null
 )
+
+data class RegisterRequest(
+    val username: String,
+    val email: String,
+    val password: String
+)

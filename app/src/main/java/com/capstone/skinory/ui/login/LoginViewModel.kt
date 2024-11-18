@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capstone.skinory.data.DataRepository
+import com.capstone.skinory.data.remote.response.LoginRequest
 import com.capstone.skinory.data.remote.response.LoginResponse
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -20,7 +21,8 @@ class LoginViewModel(private val repository: DataRepository, private val tokenDa
         _isLoading.value = true
         viewModelScope.launch {
             try {
-                val result = repository.loginUser (email, password)
+                val loginRequest = LoginRequest(email, password)
+                val result = repository.loginUser (loginRequest)
                 _loginResult.value = result
 
                 result.onSuccess { response ->

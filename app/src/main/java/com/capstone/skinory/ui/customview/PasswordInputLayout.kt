@@ -19,10 +19,19 @@ class PasswordInputLayout @JvmOverloads constructor(
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     val password = s?.toString() ?: ""
-                    if (password.isNotEmpty() && password.length < 8) {
-                        setError("Password minimal 8 karakter")
-                    } else {
-                        error = null
+                    when {
+                        password.isNotEmpty() && !password.first().isUpperCase() -> {
+                            isErrorEnabled = true
+                            error = "Password harus diawali huruf besar"
+                        }
+                        password.isNotEmpty() && password.length < 8 -> {
+                            isErrorEnabled = true
+                            error = "Password minimal 8 karakter"
+                        }
+                        else -> {
+                            isErrorEnabled = false
+                            error = null
+                        }
                     }
                 }
 
