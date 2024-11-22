@@ -12,10 +12,10 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/navigation_article"
-        android:name="com.capstone.skinory.ui.dashboard.DashboardFragment"
-        android:label="@string/title_article"
-        tools:layout="@layout/fragment_dashboard" />
+        android:id="@+id/navigation_result"
+        android:name="com.capstone.skinory.ui.result.ResultFragment"
+        android:label="@string/title_result"
+        tools:layout="@layout/fragment_result" />
 
     <fragment
         android:id="@+id/navigation_notifications"

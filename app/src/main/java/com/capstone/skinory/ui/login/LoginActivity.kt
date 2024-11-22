@@ -17,6 +17,7 @@ import com.capstone.skinory.MainActivity
 import com.capstone.skinory.R
 import com.capstone.skinory.data.Injection
 import com.capstone.skinory.databinding.ActivityLoginBinding
+import com.capstone.skinory.ui.analysis.AnalysisActivity
 import com.capstone.skinory.ui.register.RegisterActivity
 import kotlinx.coroutines.launch
 
@@ -98,7 +99,7 @@ class LoginActivity : AppCompatActivity() {
             result.onSuccess { response ->
                 // Login berhasil
                 Toast.makeText(this, "Login successful: ${response.message}", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this, MainActivity::class.java))
+                startActivity(Intent(this, AnalysisActivity::class.java))
                 finish()
             }.onFailure { exception ->
                 // Tangani error login

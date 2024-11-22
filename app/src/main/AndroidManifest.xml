@@ -15,8 +15,23 @@
         android:theme="@style/Theme.SkinOry"
         tools:targetApi="31">
         <activity
+            android:name=".ui.notifications.chose.SelectProductActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.notifications.night.NotifNightActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.notifications.day.NotifDayActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.notifications.chose.ChoseActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.analysis.AnalysisActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.login.Splash"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
