@@ -3,6 +3,7 @@ package com.capstone.skinory.ui.analysis
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.capstone.skinory.MainActivity
 import com.capstone.skinory.databinding.ActivityAnalysisBinding
 import com.capstone.skinory.ui.home.HomeFragment
 
@@ -15,7 +16,7 @@ class AnalysisActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.btnAnalysis.setOnClickListener {
-            startActivity(Intent(this, HomeFragment::class.java))
+            startActivity(Intent(this, MainActivity::class.java))
         }
     }
 }
