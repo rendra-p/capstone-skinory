@@ -7,18 +7,20 @@ import com.capstone.skinory.ui.ViewModelFactory
 import com.capstone.skinory.ui.login.TokenDataStore
 
 object Injection {
-    private fun provideUserRepository(): DataRepository {
-        val apiService = ApiConfig.getApiService()
-        return DataRepository(apiService)
-    }
-
     private fun provideTokenDataStore(context: Context): TokenDataStore {
         return TokenDataStore.getInstance(context)
     }
 
+    private fun provideUserRepository(context: Context, tokenDataStore: TokenDataStore): DataRepository {
+        val apiService = ApiConfig.getApiService(tokenDataStore) // Pass the tokenDataStore here
+        val userPreferences = UserPreferences(context)
+        return DataRepository(apiService, userPreferences, context)
+    }
+
     fun provideViewModelFactory(context: Context): ViewModelProvider.Factory {
-        val repository = provideUserRepository()
         val tokenDataStore = provideTokenDataStore(context)
-        return ViewModelFactory(repository, tokenDataStore)
+        val repository = provideUserRepository(context, tokenDataStore) // Pass tokenDataStore here
+        val userPreferences = UserPreferences(context) // Only create once
+        return ViewModelFactory(repository, tokenDataStore, userPreferences)
     }
 }

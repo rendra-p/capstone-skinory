@@ -5,12 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capstone.skinory.data.DataRepository
+import com.capstone.skinory.data.UserPreferences
 import com.capstone.skinory.data.remote.response.LoginRequest
 import com.capstone.skinory.data.remote.response.LoginResponse
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-class LoginViewModel(private val repository: DataRepository, private val tokenDataStore: TokenDataStore) : ViewModel() {
+class LoginViewModel(private val repository: DataRepository, private val tokenDataStore: TokenDataStore, private val userPreferences: UserPreferences) : ViewModel() {
     private val _loginResult = MutableLiveData<Result<LoginResponse>>()
     val loginResult: LiveData<Result<LoginResponse>> = _loginResult
 
@@ -28,6 +29,9 @@ class LoginViewModel(private val repository: DataRepository, private val tokenDa
                 result.onSuccess { response ->
                     response.loginResult?.token?.let { token ->
                         tokenDataStore.saveToken(token)
+                    }
+                    response.loginResult?.userId?.let { userId ->
+                        userPreferences.saveUserId(userId)
                     }
                 }
             } catch (e: Exception) {

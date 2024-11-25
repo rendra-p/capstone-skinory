@@ -17,7 +17,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "API_URL", "\"https://backend-skinory-73534742287.asia-southeast2.run.app/\"")
+        buildConfigField("String", "API_URL", "\"https://development-863735903001.asia-southeast2.run.app/\"")
     }
 
     buildTypes {
