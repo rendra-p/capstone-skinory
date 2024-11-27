@@ -30,15 +30,6 @@ class NotifDayActivity : AppCompatActivity() {
 
         // Set click listeners for select buttons
         setupButtonListeners()
-
-        // Observe save routine result
-        viewModel.saveRoutineResult.observe(this) { result ->
-            result.onSuccess {
-                navigateToMainActivity()
-            }.onFailure { error ->
-                Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 
     private fun setupButtonListeners() {
@@ -64,7 +55,7 @@ class NotifDayActivity : AppCompatActivity() {
 
         // Save button
         binding.button6.setOnClickListener {
-            viewModel.saveRoutine()
+            navigateToMainActivity()
         }
     }
 

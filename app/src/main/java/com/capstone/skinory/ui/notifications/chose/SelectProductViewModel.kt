@@ -17,6 +17,9 @@ class SelectProductViewModel(private val repository: DataRepository) : ViewModel
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
+    private val _saveRoutineDayResult = MutableLiveData<Result<Void?>>()
+    val saveRoutineDayResult: LiveData<Result<Void?>> = _saveRoutineDayResult
+
     fun getProducts(category: String, token: String) {
         _isLoading.value = true
         viewModelScope.launch {
@@ -24,11 +27,20 @@ class SelectProductViewModel(private val repository: DataRepository) : ViewModel
                 val result = repository.getProducts(category, token)
                 _productsResult.value = Result.success(result)
             } catch (e: Exception) {
-                Log.e("GetProductsError", "Error fetching products", e)
-                val errorMessage = e.message ?: "Failed to fetch products"
-                _productsResult.value = Result.failure(Exception(errorMessage))
+                _productsResult.value = Result.failure(e)
             } finally {
                 _isLoading.value = false
+            }
+        }
+    }
+
+    fun saveRoutineDay(category: String, productId: Int, selectedProducts: Map<String, Int>, token: String) {
+        viewModelScope.launch {
+            try {
+                val result = repository.saveRoutineDay(category, productId, selectedProducts, token)
+                _saveRoutineDayResult.value = result
+            } catch (e: Exception) {
+                _saveRoutineDayResult.value = Result.failure(e)
             }
         }
     }

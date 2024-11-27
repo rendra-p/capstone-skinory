@@ -10,34 +10,43 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.capstone.skinory.R
 import com.capstone.skinory.data.remote.response.ProductsItem
+import com.capstone.skinory.databinding.ItemProductBinding
 
 class ProductAdapter(
     private val onItemClick: (ProductsItem) -> Unit
-) : ListAdapter<ProductsItem, ProductAdapter.ProductViewHolder>(ProductDiffCallback()) {
+    ) : ListAdapter<ProductsItem, ProductAdapter.ProductViewHolder>(ProductDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_product, parent, false)
-        return ProductViewHolder(view, onItemClick)
+        val binding = ItemProductBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+        return ProductViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        val product = getItem(position)
+        holder.bind(product)
+        holder.itemView.setOnClickListener { onItemClick(product) }
     }
 
-    class ProductViewHolder(
-        itemView: View,
-        private val onItemClick: (ProductsItem) -> Unit
-    ) : RecyclerView.ViewHolder(itemView) {
+    class ProductViewHolder(private val binding: ItemProductBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
         fun bind(product: ProductsItem) {
-            itemView.findViewById<TextView>(R.id.textView2).text = product.nameProduct
-            // Load image with Glide or Picasso if needed
-            itemView.setOnClickListener {
-                onItemClick(product)
-            }
+            // Set nama produk
+            binding.textView2.text = product.nameProduct
+
+            // Memuat gambar dengan Glide
+            Glide.with(binding.root.context)
+                .load(product.imageUrl)
+                .placeholder(R.drawable.ic_baseline_insert_photo_24)
+                .into(binding.imageView3)
         }
     }
 
+    // Callback untuk membandingkan item di RecyclerView
     class ProductDiffCallback : DiffUtil.ItemCallback<ProductsItem>() {
         override fun areItemsTheSame(oldItem: ProductsItem, newItem: ProductsItem): Boolean {
             return oldItem.idProduct == newItem.idProduct

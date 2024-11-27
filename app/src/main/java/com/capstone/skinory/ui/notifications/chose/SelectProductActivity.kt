@@ -75,7 +75,17 @@ class SelectProductActivity : AppCompatActivity() {
                     showEmptyState()
                 }
             }.onFailure { exception ->
-                handleError(exception)
+                // Handle error
+            }
+        }
+
+        // Observe save routine day result
+        viewModel.saveRoutineDayResult.observe(this) { result ->
+            result.onSuccess {
+                Toast.makeText(this, "Routine day saved successfully", Toast.LENGTH_SHORT).show()
+                finish()
+            }.onFailure { exception ->
+                Toast.makeText(this, "Failed to save routine day: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -85,90 +95,9 @@ class SelectProductActivity : AppCompatActivity() {
             tokenDataStore.token.collect { token ->
                 token?.let {
                     viewModel.getProducts(category, it)
-                } ?: run {
-                    showTokenError()
                 }
             }
         }
-    }
-
-    private fun showTokenError() {
-        AlertDialog.Builder(this)
-            .setTitle("Authentication Error")
-            .setMessage("Please log in again to continue.")
-            .setPositiveButton("Login") { _, _ ->
-                // Redirect to login activity
-                val intent = Intent(this, LoginActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(intent)
-            }
-            .setCancelable(false)
-            .show()
-    }
-
-    private fun handleError(exception: Throwable) {
-        when (exception) {
-            is IOException -> showNetworkError()
-            is HttpException -> handleHttpError(exception)
-            else -> showGenericError(exception.message)
-        }
-    }
-
-    private fun showNetworkError() {
-        AlertDialog.Builder(this)
-            .setTitle("Network Error")
-            .setMessage("Please check your internet connection and try again.")
-            .setPositiveButton("Retry") { _, _ ->
-                fetchTokenAndProducts(intent.getStringExtra("CATEGORY") ?: return@setPositiveButton)
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-
-    private fun handleHttpError(httpException: HttpException) {
-        val errorBody = httpException.response()?.errorBody()?.string()
-        when (httpException.code()) {
-            401 -> showTokenError() // Unauthorized
-            403 -> showForbiddenError()
-            404 -> showNotFoundError()
-            500 -> showServerError()
-            else -> showGenericError(errorBody)
-        }
-    }
-
-    private fun showForbiddenError() {
-        AlertDialog.Builder(this)
-            .setTitle("Access Denied")
-            .setMessage("You don't have permission to access this resource.")
-            .setPositiveButton("OK", null)
-            .show()
-    }
-
-    private fun showNotFoundError() {
-        binding.emptyStateTextView.apply {
-            text = "No products found for this category"
-            visibility = View.VISIBLE
-        }
-        binding.recyclerView.visibility = View.GONE
-    }
-
-    private fun showServerError() {
-        AlertDialog.Builder(this)
-            .setTitle("Server Error")
-            .setMessage("Something went wrong on our end. Please try again later.")
-            .setPositiveButton("Retry") { _, _ ->
-                fetchTokenAndProducts(intent.getStringExtra("CATEGORY") ?: return@setPositiveButton)
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-
-    private fun showGenericError(message: String?) {
-        AlertDialog.Builder(this)
-            .setTitle("Error")
-            .setMessage(message ?: "An unexpected error occurred")
-            .setPositiveButton("OK", null)
-            .show()
     }
 
     private fun showEmptyState() {
@@ -181,14 +110,23 @@ class SelectProductActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         adapter = ProductAdapter { product ->
-            // Select product and return to previous activity
-            val intent = Intent().apply {
-                putExtra("PRODUCT_NAME", product.nameProduct)
-                putExtra("CATEGORY", product.category)
-                putExtra("PRODUCT_ID", product.idProduct)
+            lifecycleScope.launch {
+                tokenDataStore.token.collect { token ->
+                    token?.let {
+                        if (product.category != null && product.idProduct != null) {
+                            val selectedProducts = mapOf(product.category to product.idProduct)
+                            viewModel.saveRoutineDay(
+                                category = product.category,
+                                productId = product.idProduct,
+                                selectedProducts = selectedProducts,
+                                it
+                            )
+                        } else {
+                            Toast.makeText(this@SelectProductActivity, "Product category or ID is null", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
             }
-            setResult(RESULT_OK, intent)
-            finish()
         }
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(this)

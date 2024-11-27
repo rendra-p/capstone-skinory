@@ -60,19 +60,32 @@ class DataRepository(private val apiService: ApiService, private val userPrefere
         }
     }
 
-    suspend fun saveRoutineDay(selectedProducts: Map<String, Int>): Boolean {
-        val userId = userPreferences.getUserId() ?: throw Exception("User  ID not found")
-        val category = selectedProducts.keys.firstOrNull() ?: throw Exception("No category found")
-        val token = getTokenFromDataStore() ?: throw Exception("Token not found")
-        val response = apiService.saveRoutineDay(userId, category, token, selectedProducts)
-        return if (response.isSuccessful) {
-            true
-        } else {
-            throw Exception("Error saving routine")
+    suspend fun saveRoutineDay(category: String, productId: Int, selectedProducts: Map<String, Int>, token: String
+    ): Result<Void?> {
+        return try {
+            val userId = userPreferences.getUserId() ?: throw Exception("User  ID not found")
+            val response = apiService.saveRoutineDay(userId, category, productId, selectedProducts, token)
+            if (response.isSuccessful) {
+                Result.success(response.body())
+            } else {
+                throw Exception("Error saving routine: ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 
-    private suspend fun getTokenFromDataStore(): String? {
-        return TokenDataStore.getInstance(context).token.first()
+    suspend fun deleteDayRoutine(token: String): Result<Void?> {
+        return try {
+            val userId = userPreferences.getUserId() ?: throw Exception("User  ID not found")
+            val response = apiService.deleteDayRoutine(userId, token)
+            if (response.isSuccessful) {
+                Result.success(response.body())
+            } else {
+                Result.failure(Exception("Error deleting routine: ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }

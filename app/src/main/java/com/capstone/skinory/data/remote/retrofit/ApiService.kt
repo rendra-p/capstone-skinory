@@ -8,6 +8,7 @@ import com.capstone.skinory.data.remote.response.RegisterResponse
 import com.capstone.skinory.data.remote.response.RoutineListResponse
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
@@ -37,18 +38,25 @@ interface ApiService {
         @Header("Authorization") token: String
     ): RoutineListResponse
 
-    @GET("/routine/{user_id}/{category}")
+    @GET("routine/{user_id}/{category}")
     suspend fun getProductsByCategory(
         @Path("user_id") userId: String,
         @Path("category") category: String,
         @Header("Authorization") token: String
     ): Response<ProductListResponse>
 
-    @POST("/routine/{user_id}/{category}/day")
+    @POST("routine/{user_id}/{category}/day/{product_id}")
     suspend fun saveRoutineDay(
         @Path("user_id") userId: String,
         @Path("category") category: String,
-        @Header("Authorization") token: String,
-        @Body selectedProducts: Map<String, Int>
+        @Path("product_id") idProduct: Int,
+        @Body selectedProducts: Map<String, Int>,
+        @Header("Authorization") token: String
+    ): Response<Void>
+
+    @DELETE("routine/{user_id}/day")
+    suspend fun deleteDayRoutine(
+        @Path("user_id") userId: String,
+        @Header("Authorization") token: String
     ): Response<Void>
 }

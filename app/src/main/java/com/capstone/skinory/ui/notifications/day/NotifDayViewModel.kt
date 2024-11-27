@@ -23,19 +23,4 @@ class NotifDayViewModel(private val repository: DataRepository) : ViewModel() {
             _selectedProducts.value?.put(category, it)
         }
     }
-
-    fun saveRoutine() {
-        _isLoading.value = true
-        viewModelScope.launch {
-            try {
-                val result = repository.saveRoutineDay(_selectedProducts.value ?: mutableMapOf())
-                _saveRoutineResult.value = Result.success(result)
-            } catch (e: Exception) {
-                val errorMessage = e.message ?: "Failed to save routine"
-                _saveRoutineResult.value = Result.failure(Exception(errorMessage))
-            } finally {
-                _isLoading.value = false
-            }
-        }
-    }
 }
