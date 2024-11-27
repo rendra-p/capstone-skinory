@@ -27,7 +27,9 @@ class SelectProductViewModel(private val repository: DataRepository) : ViewModel
                 val result = repository.getProducts(category, token)
                 _productsResult.value = Result.success(result)
             } catch (e: Exception) {
-                _productsResult.value = Result.failure(e)
+                Log.e("GetProductsError", "Error fetching products", e)
+                val errorMessage = e.message ?: "Failed to fetch products"
+                _productsResult.value = Result.failure(Exception(errorMessage))
             } finally {
                 _isLoading.value = false
             }

@@ -32,8 +32,9 @@ class DataRepository(private val apiService: ApiService, private val userPrefere
 
     suspend fun getDayRoutines (token: String): Result<RoutineListResponse> {
         val userId = userPreferences.getUserId() ?: throw Exception("User  ID not found")
+        val formattedToken = "Bearer $token"
         return try {
-            val response = apiService.getDayRoutines(userId, token)
+            val response = apiService.getDayRoutines(userId, formattedToken)
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
@@ -42,8 +43,9 @@ class DataRepository(private val apiService: ApiService, private val userPrefere
 
     suspend fun getNightRoutines(token: String): Result<RoutineListResponse> {
         val userId = userPreferences.getUserId() ?: throw Exception("User  ID not found")
+        val formattedToken = "Bearer $token"
         return try {
-            val response = apiService.getNightRoutines(userId, token)
+            val response = apiService.getNightRoutines(userId, formattedToken)
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
@@ -52,7 +54,8 @@ class DataRepository(private val apiService: ApiService, private val userPrefere
 
     suspend fun getProducts(category: String, token: String): List<ProductsItem> {
         val userId = userPreferences.getUserId() ?: throw Exception("User  ID not found")
-        val response = apiService.getProductsByCategory(userId, category, token)
+        val formattedToken = "Bearer $token"
+        val response = apiService.getProductsByCategory(userId, category, formattedToken)
         if (response.isSuccessful) {
             return response.body()?.products?.filterNotNull() ?: emptyList()
         } else {
@@ -64,7 +67,24 @@ class DataRepository(private val apiService: ApiService, private val userPrefere
     ): Result<Void?> {
         return try {
             val userId = userPreferences.getUserId() ?: throw Exception("User  ID not found")
-            val response = apiService.saveRoutineDay(userId, category, productId, selectedProducts, token)
+            val formattedToken = "Bearer $token"
+            val response = apiService.saveRoutineDay(userId, category, productId, selectedProducts, formattedToken)
+            if (response.isSuccessful) {
+                Result.success(response.body())
+            } else {
+                throw Exception("Error saving routine: ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun saveRoutineNight(category: String, productId: Int, selectedProducts: Map<String, Int>, token: String
+    ): Result<Void?> {
+        return try {
+            val userId = userPreferences.getUserId() ?: throw Exception("User  ID not found")
+            val formattedToken = "Bearer $token"
+            val response = apiService.saveRoutineNight(userId, category, productId, selectedProducts, formattedToken)
             if (response.isSuccessful) {
                 Result.success(response.body())
             } else {
@@ -78,7 +98,23 @@ class DataRepository(private val apiService: ApiService, private val userPrefere
     suspend fun deleteDayRoutine(token: String): Result<Void?> {
         return try {
             val userId = userPreferences.getUserId() ?: throw Exception("User  ID not found")
-            val response = apiService.deleteDayRoutine(userId, token)
+            val formattedToken = "Bearer $token"
+            val response = apiService.deleteDayRoutine(userId, formattedToken)
+            if (response.isSuccessful) {
+                Result.success(response.body())
+            } else {
+                Result.failure(Exception("Error deleting routine: ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun deleteNightRoutine(token: String): Result<Void?> {
+        return try {
+            val userId = userPreferences.getUserId() ?: throw Exception("User  ID not found")
+            val formattedToken = "Bearer $token"
+            val response = apiService.deleteNightRoutine(userId, formattedToken)
             if (response.isSuccessful) {
                 Result.success(response.body())
             } else {

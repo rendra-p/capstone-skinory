@@ -121,6 +121,15 @@ class SelectProductActivity : AppCompatActivity() {
                                 selectedProducts = selectedProducts,
                                 it
                             )
+
+                            // Return "Selected" as the product name
+                            val resultIntent = Intent().apply {
+                                putExtra("PRODUCT_NAME", "Selected")
+                                putExtra("CATEGORY", product.category)
+                                putExtra("PRODUCT_ID", product.idProduct)
+                            }
+                            setResult(RESULT_OK, resultIntent)
+                            finish() // Close the activity
                         } else {
                             Toast.makeText(this@SelectProductActivity, "Product category or ID is null", Toast.LENGTH_SHORT).show()
                         }

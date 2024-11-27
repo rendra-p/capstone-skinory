@@ -54,8 +54,23 @@ interface ApiService {
         @Header("Authorization") token: String
     ): Response<Void>
 
+    @POST("routine/{user_id}/{category}/night/{product_id}")
+    suspend fun saveRoutineNight(
+        @Path("user_id") userId: String,
+        @Path("category") category: String,
+        @Path("product_id") idProduct: Int,
+        @Body selectedProducts: Map<String, Int>,
+        @Header("Authorization") token: String
+    ): Response<Void>
+
     @DELETE("routine/{user_id}/day")
     suspend fun deleteDayRoutine(
+        @Path("user_id") userId: String,
+        @Header("Authorization") token: String
+    ): Response<Void>
+
+    @DELETE("routine/{user_id}/night")
+    suspend fun deleteNightRoutine(
         @Path("user_id") userId: String,
         @Header("Authorization") token: String
     ): Response<Void>
