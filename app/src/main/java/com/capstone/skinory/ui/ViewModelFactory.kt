@@ -9,6 +9,7 @@ import com.capstone.skinory.ui.login.TokenDataStore
 import com.capstone.skinory.ui.notifications.RoutineViewModel
 import com.capstone.skinory.ui.notifications.chose.SelectProductViewModel
 import com.capstone.skinory.ui.notifications.day.NotifDayViewModel
+import com.capstone.skinory.ui.notifications.night.NotifNightViewModel
 import com.capstone.skinory.ui.register.RegisterViewModel
 
 class ViewModelFactory(
@@ -30,6 +31,9 @@ class ViewModelFactory(
             }
             modelClass.isAssignableFrom(NotifDayViewModel::class.java) -> {
                 NotifDayViewModel(repository) as T
+            }
+            modelClass.isAssignableFrom(NotifNightViewModel::class.java) -> {
+                NotifNightViewModel(repository) as T
             }
             modelClass.isAssignableFrom(SelectProductViewModel::class.java) -> {
                 SelectProductViewModel(repository) as T
