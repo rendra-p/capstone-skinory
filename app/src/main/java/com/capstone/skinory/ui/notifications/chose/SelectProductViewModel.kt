@@ -20,6 +20,9 @@ class SelectProductViewModel(private val repository: DataRepository) : ViewModel
     private val _saveRoutineDayResult = MutableLiveData<Result<Void?>>()
     val saveRoutineDayResult: LiveData<Result<Void?>> = _saveRoutineDayResult
 
+    private val _saveRoutineNightResult = MutableLiveData<Result<Void?>>()
+    val saveRoutineNightResult: LiveData<Result<Void?>> = _saveRoutineNightResult
+
     fun getProducts(category: String, token: String) {
         _isLoading.value = true
         viewModelScope.launch {
@@ -43,6 +46,17 @@ class SelectProductViewModel(private val repository: DataRepository) : ViewModel
                 _saveRoutineDayResult.value = result
             } catch (e: Exception) {
                 _saveRoutineDayResult.value = Result.failure(e)
+            }
+        }
+    }
+
+    fun saveRoutineNight(category: String, productId: Int, selectedProducts: Map<String, Int>, token: String) {
+        viewModelScope.launch {
+            try {
+                val result = repository.saveRoutineNight(category, productId, selectedProducts, token)
+                _saveRoutineNightResult.value = result
+            } catch (e: Exception) {
+                _saveRoutineNightResult.value = Result.failure(e)
             }
         }
     }

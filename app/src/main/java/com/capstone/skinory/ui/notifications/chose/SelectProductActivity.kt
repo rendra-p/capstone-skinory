@@ -34,6 +34,7 @@ class SelectProductActivity : AppCompatActivity() {
     private lateinit var viewModel: SelectProductViewModel
     private lateinit var adapter: ProductAdapter
     private lateinit var tokenDataStore: TokenDataStore
+    private lateinit var routineType: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +44,7 @@ class SelectProductActivity : AppCompatActivity() {
         tokenDataStore = TokenDataStore.getInstance(this)
 
         val category = intent.getStringExtra("CATEGORY") ?: return
+        routineType = intent.getStringExtra("ROUTINE_TYPE") ?: "day"
 
         // Setup ViewModel
         val viewModelFactory = Injection.provideViewModelFactory(this)
@@ -79,13 +81,24 @@ class SelectProductActivity : AppCompatActivity() {
             }
         }
 
-        // Observe save routine day result
-        viewModel.saveRoutineDayResult.observe(this) { result ->
-            result.onSuccess {
-                Toast.makeText(this, "Routine day saved successfully", Toast.LENGTH_SHORT).show()
-                finish()
-            }.onFailure { exception ->
-                Toast.makeText(this, "Failed to save routine day: ${exception.message}", Toast.LENGTH_SHORT).show()
+        // Observe save routine result based on routine type
+        if (routineType == "day") {
+            viewModel.saveRoutineDayResult.observe(this) { result ->
+                result.onSuccess {
+                    Toast.makeText(this, "Routine day saved successfully", Toast.LENGTH_SHORT).show()
+                    finish()
+                }.onFailure { exception ->
+                    Toast.makeText(this, "Failed to save routine day: ${exception.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } else {
+            viewModel.saveRoutineNightResult.observe(this) { result ->
+                result.onSuccess {
+                    Toast.makeText(this, "Routine night saved successfully", Toast.LENGTH_SHORT).show()
+                    finish()
+                }.onFailure { exception ->
+                    Toast.makeText(this, "Failed to save routine night: ${exception.message}", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -115,12 +128,23 @@ class SelectProductActivity : AppCompatActivity() {
                     token?.let {
                         if (product.category != null && product.idProduct != null) {
                             val selectedProducts = mapOf(product.category to product.idProduct)
-                            viewModel.saveRoutineDay(
-                                category = product.category,
-                                productId = product.idProduct,
-                                selectedProducts = selectedProducts,
-                                it
-                            )
+
+                            // Pilih metode save berdasarkan routineType
+                            if (routineType == "day") {
+                                viewModel.saveRoutineDay(
+                                    category = product.category,
+                                    productId = product.idProduct,
+                                    selectedProducts = selectedProducts,
+                                    it
+                                )
+                            } else {
+                                viewModel.saveRoutineNight(
+                                    category = product.category,
+                                    productId = product.idProduct,
+                                    selectedProducts = selectedProducts,
+                                    it
+                                )
+                            }
 
                             // Return "Selected" as the product name
                             val resultIntent = Intent().apply {

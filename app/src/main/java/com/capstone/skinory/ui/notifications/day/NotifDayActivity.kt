@@ -62,6 +62,7 @@ class NotifDayActivity : AppCompatActivity() {
     private fun navigateToSelectProduct(category: String) {
         val intent = Intent(this, SelectProductActivity::class.java).apply {
             putExtra("CATEGORY", category)
+            putExtra("ROUTINE_TYPE", "day")
         }
         startActivityForResult(intent, REQUEST_CODE_SELECT_PRODUCT)
     }
