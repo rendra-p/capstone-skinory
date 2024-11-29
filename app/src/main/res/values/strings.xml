@@ -27,7 +27,8 @@
     <string name="save">Save</string>
     <string name="delete">Delete</string>
     <string name="empty">Empty</string>
-    <string name="hello_main">Hello %1$s!</string>
+    <string name="hello_username">Hello %1$s!</string>
+    <string name="skin_type_result">According to our model your skin type is %1$s.</string>
     <string name="greed_main">How are you today?</string>
     <string name="or">OR</string>
     <string name="btntv_seemore">Seemore</string>

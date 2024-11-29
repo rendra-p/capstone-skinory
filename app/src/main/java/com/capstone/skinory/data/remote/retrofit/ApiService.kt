@@ -1,8 +1,10 @@
 package com.capstone.skinory.data.remote.retrofit
 
+import com.capstone.skinory.data.remote.response.BestProductResponse
 import com.capstone.skinory.data.remote.response.LoginRequest
 import com.capstone.skinory.data.remote.response.LoginResponse
 import com.capstone.skinory.data.remote.response.ProductListResponse
+import com.capstone.skinory.data.remote.response.ProfileResponse
 import com.capstone.skinory.data.remote.response.RegisterRequest
 import com.capstone.skinory.data.remote.response.RegisterResponse
 import com.capstone.skinory.data.remote.response.RoutineListResponse
@@ -25,6 +27,18 @@ interface ApiService {
     suspend fun login(
         @Body loginRequest: LoginRequest
     ): LoginResponse
+
+    @GET("profile/{user_id}")
+    suspend fun getProfile(
+        @Path("user_id") userId: String,
+        @Header("Authorization") token: String
+    ): ProfileResponse
+
+    @GET("product/best/{user_id}")
+    suspend fun getBestProduct(
+        @Path("user_id") userId: String,
+        @Header("Authorization") token: String
+    ): BestProductResponse
 
     @GET("routine/{user_id}/day")
     suspend fun getDayRoutines(

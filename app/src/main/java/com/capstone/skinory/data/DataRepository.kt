@@ -1,9 +1,11 @@
 package com.capstone.skinory.data
 
 import android.content.Context
+import com.capstone.skinory.data.remote.response.BestProductResponse
 import com.capstone.skinory.data.remote.response.LoginRequest
 import com.capstone.skinory.data.remote.response.LoginResponse
 import com.capstone.skinory.data.remote.response.ProductsItem
+import com.capstone.skinory.data.remote.response.ProfileResponse
 import com.capstone.skinory.data.remote.response.RegisterRequest
 import com.capstone.skinory.data.remote.response.RegisterResponse
 import com.capstone.skinory.data.remote.response.RoutineListResponse
@@ -11,7 +13,7 @@ import com.capstone.skinory.data.remote.retrofit.ApiService
 import com.capstone.skinory.ui.login.TokenDataStore
 import kotlinx.coroutines.flow.first
 
-class DataRepository(private val apiService: ApiService, private val userPreferences: UserPreferences, private val context: Context) {
+class DataRepository(private val apiService: ApiService, private val userPreferences: UserPreferences) {
     suspend fun registerUser(registerRequest: RegisterRequest): Result<RegisterResponse> {
         return try {
             val response = apiService.register(registerRequest)
@@ -24,6 +26,28 @@ class DataRepository(private val apiService: ApiService, private val userPrefere
     suspend fun loginUser (loginRequest: LoginRequest): Result<LoginResponse> {
         return try {
             val response = apiService.login(loginRequest)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getProfile (token: String): Result<ProfileResponse> {
+        val userId = userPreferences.getUserId() ?: throw Exception("User  ID not found")
+        val formattedToken = "Bearer $token"
+        return try {
+            val response = apiService.getProfile(userId, formattedToken)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getBestProduct (token: String): Result<BestProductResponse> {
+        val userId = userPreferences.getUserId() ?: throw Exception("User  ID not found")
+        val formattedToken = "Bearer $token"
+        return try {
+            val response = apiService.getBestProduct(userId, formattedToken)
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)

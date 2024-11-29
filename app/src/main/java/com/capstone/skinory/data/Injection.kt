@@ -14,7 +14,7 @@ object Injection {
     private fun provideUserRepository(context: Context, tokenDataStore: TokenDataStore): DataRepository {
         val apiService = ApiConfig.getApiService(tokenDataStore) // Pass the tokenDataStore here
         val userPreferences = UserPreferences(context)
-        return DataRepository(apiService, userPreferences, context)
+        return DataRepository(apiService, userPreferences)
     }
 
     fun provideViewModelFactory(context: Context): ViewModelProvider.Factory {

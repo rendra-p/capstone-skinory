@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.capstone.skinory.data.DataRepository
 import com.capstone.skinory.data.UserPreferences
+import com.capstone.skinory.ui.home.HomeViewModel
 import com.capstone.skinory.ui.login.LoginViewModel
 import com.capstone.skinory.ui.login.TokenDataStore
 import com.capstone.skinory.ui.notifications.RoutineViewModel
@@ -11,6 +12,7 @@ import com.capstone.skinory.ui.notifications.chose.SelectProductViewModel
 import com.capstone.skinory.ui.notifications.day.NotifDayViewModel
 import com.capstone.skinory.ui.notifications.night.NotifNightViewModel
 import com.capstone.skinory.ui.register.RegisterViewModel
+import com.capstone.skinory.ui.result.ResultViewModel
 
 class ViewModelFactory(
     private val repository: DataRepository,
@@ -25,6 +27,12 @@ class ViewModelFactory(
             }
             modelClass.isAssignableFrom(LoginViewModel::class.java) -> {
                 LoginViewModel(repository, tokenDataStore!!, userPreferences!!) as T
+            }
+            modelClass.isAssignableFrom(HomeViewModel::class.java) -> {
+                HomeViewModel(repository, tokenDataStore!!) as T
+            }
+            modelClass.isAssignableFrom(ResultViewModel::class.java) -> {
+                ResultViewModel(repository, tokenDataStore!!) as T
             }
             modelClass.isAssignableFrom(RoutineViewModel::class.java) -> {
                 RoutineViewModel(repository, tokenDataStore!!) as T

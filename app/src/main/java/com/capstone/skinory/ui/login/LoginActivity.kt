@@ -3,24 +3,17 @@ package com.capstone.skinory.ui.login
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import com.capstone.skinory.MainActivity
 import com.capstone.skinory.R
 import com.capstone.skinory.data.Injection
 import com.capstone.skinory.databinding.ActivityLoginBinding
 import com.capstone.skinory.ui.analysis.AnalysisActivity
 import com.capstone.skinory.ui.register.RegisterActivity
-import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding

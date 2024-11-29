@@ -3,13 +3,9 @@ package com.capstone.skinory.ui.login
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import com.capstone.skinory.MainActivity
-import com.capstone.skinory.R
+import com.capstone.skinory.ui.MainActivity
 import com.capstone.skinory.databinding.ActivitySplashBinding
 import kotlinx.coroutines.launch
 
