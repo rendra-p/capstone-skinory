@@ -1,5 +1,6 @@
 package com.capstone.skinory.ui.notifications
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -41,6 +42,31 @@ class RoutineViewModel(
                         }
                     } catch (e: Exception) {
                         // Handle error
+                    }
+                }
+            }
+        }
+    }
+
+    fun deleteRoutine(isDay: Boolean) {
+        viewModelScope.launch {
+            tokenDataStore.token.collect { token ->
+                token?.let {
+                    try {
+                        val result = if (isDay) {
+                            repository.deleteDayRoutine(token)
+                        } else {
+                            repository.deleteNightRoutine(token)
+                        }
+                        result.onSuccess {
+                            // Refresh routines after deletion
+                            fetchRoutines()
+                        }.onFailure { exception ->
+                            // Handle error
+                            Log.e("RoutineViewModel", "Delete routine error", exception)
+                        }
+                    } catch (e: Exception) {
+                        Log.e("RoutineViewModel", "Delete routine error", e)
                     }
                 }
             }

@@ -8,12 +8,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.capstone.skinory.data.remote.response.RoutinesItem
 import com.capstone.skinory.databinding.ItemNotificationBinding
 
-class NotificationAdapter : ListAdapter<RoutinesItem, NotificationAdapter.NotificationViewHolder>(RoutineItemDiffCallback()) {
-
-    private var routineType: String = "Day"
-    fun submitRoutineType(type: String) {
-        routineType = type
-    }
+class NotificationAdapter(
+    private val viewModel: RoutineViewModel,
+    private val onDeleteClick: (RoutinesItem) -> Unit
+) : ListAdapter<RoutinesItem, NotificationAdapter.NotificationViewHolder>(RoutineItemDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotificationViewHolder {
         val binding = ItemNotificationBinding.inflate(
@@ -25,24 +23,30 @@ class NotificationAdapter : ListAdapter<RoutinesItem, NotificationAdapter.Notifi
     }
 
     override fun onBindViewHolder(holder: NotificationViewHolder, position: Int) {
-        holder.bind(getItem(position), routineType)
+        val routine = getItem(position)
+        holder.bind(
+            routine,
+            onDeleteClick = { onDeleteClick(routine) }
+        )
     }
 
     class NotificationViewHolder(
         private val binding: ItemNotificationBinding
     ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(routine: RoutinesItem, routineType: String) {
-            binding.textView.text = routineType
-
+        fun bind(
+            routine: RoutinesItem,
+            onDeleteClick: () -> Unit
+        ) {
+            binding.textView.text = routine.applied ?: "Unknown"
 
             val products = routine.nameProduct?.split(",")?.map { it.trim() } ?: listOf("No Product")
             binding.textView3.text = products.mapIndexed { index, product ->
                 "${index + 1}. $product"
             }.joinToString("\n")
 
-            // You might want to add logic to handle the switch state
-            // This depends on how you want to manage routine activation
-            binding.switch2.isChecked = true // Default to checked
+            binding.imageButton.setOnClickListener {
+                onDeleteClick()
+            }
         }
     }
 }
