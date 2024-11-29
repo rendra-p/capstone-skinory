@@ -22,3 +22,8 @@ data class RoutinesItem(
 	@field:SerializedName("skin_type")
 	val skinType: String? = null
 )
+
+data class GroupedRoutinesItem(
+	val applied: String,
+	val products: List<String>
+)

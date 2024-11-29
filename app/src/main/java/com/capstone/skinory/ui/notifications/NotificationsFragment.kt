@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.capstone.skinory.data.Injection
 import com.capstone.skinory.data.UserPreferences
+import com.capstone.skinory.data.remote.response.GroupedRoutinesItem
 import com.capstone.skinory.databinding.FragmentNotificationsBinding
 import com.capstone.skinory.ui.ViewModelFactory
 import com.capstone.skinory.ui.login.LoginViewModel
@@ -25,8 +26,9 @@ import com.capstone.skinory.ui.notifications.notify.NotificationHelper
 
 class NotificationsFragment : Fragment() {
 
+    private var _binding: FragmentNotificationsBinding? = null
+    private val binding get() = _binding!!
     private lateinit var notificationAdapter: NotificationAdapter
-    private lateinit var binding: FragmentNotificationsBinding
     private lateinit var routineViewModel: RoutineViewModel
     private lateinit var notificationHelper: NotificationHelper
     private lateinit var userPreferences: UserPreferences
@@ -36,7 +38,7 @@ class NotificationsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentNotificationsBinding.inflate(inflater, container, false)
+        _binding = FragmentNotificationsBinding.inflate(inflater, container, false)
 
         notificationHelper = NotificationHelper(requireContext())
         userPreferences = UserPreferences(requireContext())
@@ -142,7 +144,14 @@ class NotificationsFragment : Fragment() {
     private fun observeRoutines() {
         routineViewModel.dayRoutines.observe(viewLifecycleOwner) { dayRoutines ->
             routineViewModel.nightRoutines.observe(viewLifecycleOwner) { nightRoutines ->
-                val combinedRoutines = dayRoutines + nightRoutines
+                val combinedRoutines = (dayRoutines + nightRoutines)
+                    .groupBy { it.applied }
+                    .map { (applied, routines) ->
+                        GroupedRoutinesItem(
+                            applied = applied ?: "Unknown",
+                            products = routines.flatMap { it.nameProduct?.split(",")?.map { product -> product.trim() } ?: emptyList() }
+                        )
+                    }
 
                 notificationAdapter.submitList(combinedRoutines)
 
@@ -162,6 +171,11 @@ class NotificationsFragment : Fragment() {
             // Only allow adding new routine if less than 2 active routines
             startActivity(Intent(requireContext(), ChoseActivity::class.java))
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {

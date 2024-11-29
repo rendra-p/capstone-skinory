@@ -2,18 +2,12 @@ package com.capstone.skinory.ui.notifications.night
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
-import com.capstone.skinory.MainActivity
-import com.capstone.skinory.R
+import com.capstone.skinory.ui.MainActivity
 import com.capstone.skinory.data.Injection
 import com.capstone.skinory.databinding.ActivityNotifNightBinding
 import com.capstone.skinory.ui.notifications.chose.SelectProductActivity
-import com.capstone.skinory.ui.notifications.day.NotifDayActivity
-import com.capstone.skinory.ui.notifications.day.NotifDayActivity.Companion
 
 class NotifNightActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNotifNightBinding
@@ -64,7 +58,8 @@ class NotifNightActivity : AppCompatActivity() {
 
     private fun navigateToMainActivity() {
         val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            putExtra("navigate_to", "notifications")
         }
         startActivity(intent)
         finish()
