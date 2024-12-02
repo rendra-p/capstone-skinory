@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import java.util.Calendar
 
 class NotificationHelper(private val context: Context) {
@@ -12,6 +13,7 @@ class NotificationHelper(private val context: Context) {
     private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     fun scheduleRoutineReminder(isDay: Boolean) {
+        Log.d("AlarmManager", "Scheduling ${if (isDay) "morning" else "evening"} routine reminder")
         val intent = Intent(context, NotificationReceiver::class.java).apply {
             putExtra("is_day", isDay)
         }
@@ -34,6 +36,7 @@ class NotificationHelper(private val context: Context) {
         if (calendar.timeInMillis <= System.currentTimeMillis()) {
             calendar.add(Calendar.DAY_OF_YEAR, 1)
         }
+        Log.d("AlarmManager", "Alarm set for: ${calendar.time}")
 
         // Set alarm berulang setiap hari
         alarmManager.setRepeating(
@@ -42,6 +45,9 @@ class NotificationHelper(private val context: Context) {
             AlarmManager.INTERVAL_DAY,
             pendingIntent
         )
+
+        Log.d("AlarmManager", "Current time: ${Calendar.getInstance().time}")
+        Log.d("AlarmManager", "Scheduled time: ${calendar.time}")
     }
 
     fun cancelRoutineReminder(isDay: Boolean) {

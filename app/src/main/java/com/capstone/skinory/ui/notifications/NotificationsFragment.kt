@@ -5,10 +5,13 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -32,6 +35,36 @@ class NotificationsFragment : Fragment() {
     private lateinit var routineViewModel: RoutineViewModel
     private lateinit var notificationHelper: NotificationHelper
     private lateinit var userPreferences: UserPreferences
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // Inisialisasi permission launcher
+        requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                // Izin diberikan, lanjutkan dengan pengaturan notifikasi
+                setupNotificationSwitch()
+                Toast.makeText(
+                    requireContext(),
+                    "Notification permission granted",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                // Izin ditolak
+                Toast.makeText(
+                    requireContext(),
+                    "Notification permission is required",
+                    Toast.LENGTH_LONG
+                ).show()
+
+                // Nonaktifkan switch
+                binding.switch1.isChecked = false
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,7 +79,7 @@ class NotificationsFragment : Fragment() {
         val viewModelFactory = Injection.provideViewModelFactory(requireContext())
         routineViewModel = ViewModelProvider(this, viewModelFactory)[RoutineViewModel::class.java]
 
-        requestNotificationPermission()
+        checkNotificationPermission()
         setupRecyclerView()
         observeRoutines()
         setupFloatingActionButton()
@@ -59,42 +92,46 @@ class NotificationsFragment : Fragment() {
 
     }
 
-    private fun requestNotificationPermission() {
+    private fun checkNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(
+            when {
+                ContextCompat.checkSelfPermission(
                     requireContext(),
                     Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestPermissions(
-                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                    NOTIFICATION_PERMISSION_REQUEST_CODE
-                )
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    Log.d("NotificationPermission", "Permission already granted")
+                    setupNotificationSwitch()
+                }
+                shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
+                    Log.d("NotificationPermission", "Show rationale dialog")
+                    showPermissionRationaleDialog()
+                }
+                else -> {
+                    Log.d("NotificationPermission", "Requesting permission")
+                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
             }
+        } else {
+            Log.d("NotificationPermission", "Below Android 13, setup switch directly")
+            setupNotificationSwitch()
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED
-            ) {
-                // Izin diberikan, lanjutkan dengan pengaturan notifikasi
-                setupNotificationSwitch()
-            } else {
-                // Izin ditolak, beri tahu pengguna
-                Toast.makeText(
-                    requireContext(),
-                    "Notification permission is required to send reminders",
-                    Toast.LENGTH_LONG
-                ).show()
+    private fun showPermissionRationaleDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Notification Permission")
+            .setMessage("This app needs notification permission to send you routine reminders. Would you like to grant permission?")
+            .setPositiveButton("Yes") { _, _ ->
+                // Minta izin
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
-        }
+            .setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+                // Nonaktifkan switch
+                binding.switch1.isChecked = false
+            }
+            .create()
+            .show()
     }
 
     private fun setupNotificationSwitch() {
@@ -103,15 +140,31 @@ class NotificationsFragment : Fragment() {
         binding.switch1.isChecked = isNotificationEnabled
 
         binding.switch1.setOnCheckedChangeListener { _, isChecked ->
+            // Pastikan izin sudah diberikan sebelum mengaktifkan notifikasi
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (isChecked && ContextCompat.checkSelfPermission(
+                        requireContext(),
+                        Manifest.permission.POST_NOTIFICATIONS
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    // Minta izin jika belum diberikan
+                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    return@setOnCheckedChangeListener
+                }
+            }
+
             // Simpan status switch di UserPreferences
+            Log.d("NotificationSwitch", "Switch state changed: $isChecked")
             userPreferences.saveNotificationStatus(isChecked)
 
             if (isChecked) {
+                Log.d("NotificationSwitch", "Notifications enabled")
                 // Aktifkan notifikasi untuk Day (jam 6 pagi)
                 notificationHelper.scheduleRoutineReminder(true)
                 // Aktifkan notifikasi untuk Night (jam 8 malam)
                 notificationHelper.scheduleRoutineReminder(false)
             } else {
+                Log.d("NotificationSwitch", "Notifications disabled")
                 // Matikan notifikasi untuk Day
                 notificationHelper.cancelRoutineReminder(true)
                 // Matikan notifikasi untuk Night
