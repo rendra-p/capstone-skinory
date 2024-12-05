@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.capstone.skinory.ui.MainActivity
 import com.capstone.skinory.databinding.ActivitySplashBinding
+import com.capstone.skinory.ui.analysis.AnalysisActivity
 import kotlinx.coroutines.launch
 
 @Suppress("DEPRECATION")
@@ -32,8 +33,8 @@ class Splash : AppCompatActivity() {
         lifecycleScope.launch {
             tokenDataStore.token.collect { token ->
                 if (!token.isNullOrEmpty()) {
-                    // Arahkan ke MainActivity jika token ada
                     startActivity(Intent(this@Splash, MainActivity::class.java))
+//                    startActivity(Intent(this@Splash, AnalysisActivity::class.java))
                     finish()
                 }
                 else{
