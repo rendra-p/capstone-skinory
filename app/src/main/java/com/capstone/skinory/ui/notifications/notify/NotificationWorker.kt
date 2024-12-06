@@ -112,33 +112,18 @@ class NotificationWorker(
         val notificationHelper = NotificationHelper(context)
         val userPreferences = UserPreferences(context)
         if (userPreferences.areNotificationsEnabled()) {
-            val currentTime = Calendar.getInstance()
             if (type == "Day") {
-//                notificationHelper.scheduleRoutineNotification(
-//                    requestCode = NotificationHelper.DAY_NOTIFICATION_REQUEST_CODE,
-//                    hour = 6,
-//                    minute = 0,
-//                    type = "Day"
-//                )
                 notificationHelper.scheduleRoutineNotification(
                     requestCode = NotificationHelper.DAY_NOTIFICATION_REQUEST_CODE,
-                    hour = currentTime.get(Calendar.HOUR_OF_DAY),
-                    minute = currentTime.get(Calendar.MINUTE),
-                    second = currentTime.get(Calendar.SECOND) + 60,
+                    hour = 6,
+                    minute = 0,
                     type = "Day"
                 )
             } else if (type == "Night") {
-//                notificationHelper.scheduleRoutineNotification(
-//                    requestCode = NotificationHelper.NIGHT_NOTIFICATION_REQUEST_CODE,
-//                    hour = 20,
-//                    minute = 0,
-//                    type = "Night"
-//                )
                 notificationHelper.scheduleRoutineNotification(
                     requestCode = NotificationHelper.NIGHT_NOTIFICATION_REQUEST_CODE,
-                    hour = currentTime.get(Calendar.HOUR_OF_DAY),
-                    minute = currentTime.get(Calendar.MINUTE),
-                    second = currentTime.get(Calendar.SECOND) + 60,
+                    hour = 20,
+                    minute = 0,
                     type = "Night"
                 )
             }

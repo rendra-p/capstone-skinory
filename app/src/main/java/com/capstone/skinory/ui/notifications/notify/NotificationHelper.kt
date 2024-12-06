@@ -67,51 +67,34 @@ class NotificationHelper(private val context: Context) {
         cancelNotifications()
 
         // Schedule Day Notification at 6 AM
-//        scheduleRoutineNotification(
-//            requestCode = DAY_NOTIFICATION_REQUEST_CODE,
-//            hour = 6,
-//            minute = 0,
-//            type = "Day"
-//        )
-//
-//        // Schedule Night Notification at 8 PM
-//        scheduleRoutineNotification(
-//            requestCode = NIGHT_NOTIFICATION_REQUEST_CODE,
-//            hour = 20,
-//            minute = 0,
-//            type = "Night"
-//        )
-        val currentTime = Calendar.getInstance()
-
         scheduleRoutineNotification(
             requestCode = DAY_NOTIFICATION_REQUEST_CODE,
-            hour = currentTime.get(Calendar.HOUR_OF_DAY),
-            minute = currentTime.get(Calendar.MINUTE),
-            second = currentTime.get(Calendar.SECOND) + 30,
+            hour = 6,
+            minute = 0,
             type = "Day"
         )
+
+        // Schedule Night Notification at 8 PM
         scheduleRoutineNotification(
             requestCode = NIGHT_NOTIFICATION_REQUEST_CODE,
-            hour = currentTime.get(Calendar.HOUR_OF_DAY),
-            minute = currentTime.get(Calendar.MINUTE),
-            second = currentTime.get(Calendar.SECOND) + 60,
+            hour = 20,
+            minute = 0,
             type = "Night"
         )
     }
 
     @SuppressLint("ScheduleExactAlarm")
-    fun scheduleRoutineNotification(requestCode: Int, hour: Int, minute: Int, second: Int, type: String) {
+    fun scheduleRoutineNotification(requestCode: Int, hour: Int, minute: Int, type: String) {
 
         val calendar = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, hour)
             set(Calendar.MINUTE, minute)
-            set(Calendar.SECOND, second)
+            set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
 
             // If the time has already passed today, schedule for tomorrow
             if (timeInMillis <= System.currentTimeMillis()) {
-//                add(Calendar.DAY_OF_YEAR, 1)
-                add(Calendar.MINUTE, 1)
+                add(Calendar.DAY_OF_YEAR, 1)
             }
         }
         // Buat constraints untuk pekerjaan

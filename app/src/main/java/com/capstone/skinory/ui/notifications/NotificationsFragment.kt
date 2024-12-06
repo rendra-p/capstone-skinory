@@ -3,6 +3,7 @@ package com.capstone.skinory.ui.notifications
 import android.Manifest
 import android.app.AlarmManager
 import android.content.ActivityNotFoundException
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -32,6 +33,7 @@ import com.capstone.skinory.ui.ViewModelFactory
 import com.capstone.skinory.ui.login.LoginViewModel
 import com.capstone.skinory.ui.notifications.chose.ChoseActivity
 import com.capstone.skinory.ui.notifications.notify.NotificationHelper
+import java.util.Locale
 
 class NotificationsFragment : Fragment() {
 
@@ -171,6 +173,9 @@ class NotificationsFragment : Fragment() {
         binding.switch1.setOnCheckedChangeListener { _, isChecked ->
             when {
                 isChecked -> {
+                    if (!userPreferences.isAutoStartPermissionRequested()) {
+                        checkAutoStartPermission()
+                    }
                     // Periksa izin alarm
                     if (!hasExactAlarmPermission()) {
                         checkAndRequestAlarmPermission()
@@ -204,6 +209,7 @@ class NotificationsFragment : Fragment() {
                     // Matikan notifikasi
                     notificationHelper.cancelNotifications()
                     userPreferences.setNotificationsEnabled(false)
+                    userPreferences.setAutoStartPermissionRequested(false)
                     Log.d("NotificationsFragment", "Notifications disabled")
                 }
             }
@@ -302,6 +308,173 @@ class NotificationsFragment : Fragment() {
         binding.floatingActionButton.setOnClickListener {
             // Only allow adding new routine if less than 2 active routines
             startActivity(Intent(requireContext(), ChoseActivity::class.java))
+        }
+    }
+
+    private fun checkAutoStartPermission() {
+        val manufacturer = Build.MANUFACTURER.lowercase(Locale.getDefault())
+        if (isAutoStartPermissionRequired(manufacturer)) {
+            if (!isAutoStartPermissionGranted(manufacturer)) {
+                showAutoStartPermissionDialog()
+            }
+        }
+    }
+
+    private fun showAutoStartPermissionDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Izin Auto-Start")
+            .setMessage("Untuk memastikan notifikasi berjalan lancar, mohon izinkan aplikasi untuk berjalan di latar belakang.")
+            .setPositiveButton("Buka Pengaturan") { _, _ ->
+                try {
+                    val manufacturer = Build.MANUFACTURER.lowercase(Locale.getDefault())
+                    when (manufacturer) {
+                        "xiaomi" -> openXiaomiAutoStartSettings()
+                        "oppo" -> openOppoAutoStartSettings()
+                        "vivo" -> openVivoAutoStartSettings()
+                        "huawei" -> openHuaweiAutoStartSettings()
+                        else -> openGenericAutoStartSettings()
+                    }
+
+                    // Tandai bahwa izin auto-start telah diminta
+                    userPreferences.setAutoStartPermissionRequested(true)
+                } catch (e: Exception) {
+                    Log.e("NotificationsFragment", "Tidak dapat membuka pengaturan auto-start", e)
+                }
+            }
+            .setNegativeButton("Batal", null)
+            .show()
+    }
+
+    private fun openXiaomiAutoStartSettings() {
+        val intent = Intent().apply {
+            component = ComponentName(
+                "com.miui.securitycenter",
+                "com.miui.permcenter.autostart.AutoStartManagementActivity"
+            )
+        }
+        startActivity(intent)
+    }
+
+    private fun openOppoAutoStartSettings() {
+        val intent = Intent().apply {
+            component = ComponentName(
+                "com.color.safecenter",
+                "com.color.safecenter.permission.startup.StartupAppListActivity"
+            )
+        }
+        startActivity(intent)
+    }
+
+    private fun openVivoAutoStartSettings() {
+        val intent = Intent().apply {
+            component = ComponentName(
+                "com.vivo.permissionmanager",
+                "com.vivo.permissionmanager.activity.BgStartUpManagerActivity"
+            )
+        }
+        startActivity(intent)
+    }
+
+    private fun openHuaweiAutoStartSettings() {
+        val intent = Intent().apply {
+            component = ComponentName(
+                "com.huawei.systemmanager",
+                "com.huawei.systemmanager.startsupport.dialog.ExtraDialogActivity"
+            )
+            putExtra("package", context?.packageName)
+        }
+        startActivity(intent)
+    }
+
+    private fun openGenericAutoStartSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        val uri = Uri.fromParts("package", requireContext().packageName, null)
+        intent.data = uri
+        startActivity(intent)
+    }
+
+    private fun isAutoStartPermissionRequired(manufacturer: String): Boolean {
+        return listOf("xiaomi", "oppo", "vivo", "huawei", "letv", "honor")
+            .contains(manufacturer)
+    }
+
+    private fun isAutoStartPermissionGranted(manufacturer: String): Boolean {
+        return try {
+            when (manufacturer) {
+                "xiaomi" -> isXiaomiAutoStartPermissionGranted()
+                "oppo" -> isOppoAutoStartPermissionGranted()
+                "vivo" -> isVivoAutoStartPermissionGranted()
+                "huawei" -> isHuaweiAutoStartPermissionGranted()
+                else -> true
+            }
+        } catch (e: Exception) {
+            Log.e("NotificationsFragment", "Error checking auto-start permission", e)
+            true // Default to true if we can't determine
+        }
+    }
+
+    private fun isXiaomiAutoStartPermissionGranted(): Boolean {
+        return try {
+            val intent = Intent().apply {
+                component = ComponentName(
+                    "com.miui.securitycenter",
+                    "com.miui.permcenter.autostart.AutoStartManagementActivity"
+                )
+            }
+            val resolveInfo = context?.packageManager?.resolveActivity(intent, 0)
+            resolveInfo == null
+        } catch (e: Exception) {
+            Log.e("NotificationsFragment", "Error checking Xiaomi auto-start permission", e)
+            true
+        }
+    }
+
+    private fun isOppoAutoStartPermissionGranted(): Boolean {
+        return try {
+            val intent = Intent().apply {
+                component = ComponentName(
+                    "com.color.safecenter",
+                    "com.color.safecenter.permission.startup.StartupAppListActivity"
+                )
+            }
+            val resolveInfo = context?.packageManager?.resolveActivity(intent, 0)
+            resolveInfo == null
+        } catch (e: Exception) {
+            Log.e("NotificationsFragment", "Error checking Oppo auto-start permission", e)
+            true
+        }
+    }
+
+    private fun isVivoAutoStartPermissionGranted(): Boolean {
+        return try {
+            val intent = Intent().apply {
+                component = ComponentName(
+                    "com.vivo.permissionmanager",
+                    "com.vivo.permissionmanager.activity.BgStartUpManagerActivity"
+                )
+            }
+            val resolveInfo = context?.packageManager?.resolveActivity(intent, 0)
+            resolveInfo == null
+        } catch (e: Exception) {
+            Log.e("NotificationsFragment", "Error checking Vivo auto-start permission", e)
+            true
+        }
+    }
+
+    private fun isHuaweiAutoStartPermissionGranted(): Boolean {
+        return try {
+            val intent = Intent().apply {
+                component = ComponentName(
+                    "com.huawei.systemmanager",
+                    "com.huawei.systemmanager.startsupport.dialog.ExtraDialogActivity"
+                )
+                putExtra("package", context?.packageName)
+            }
+            val resolveInfo = context?.packageManager?.resolveActivity(intent, 0)
+            resolveInfo == null
+        } catch (e: Exception) {
+            Log.e("NotificationsFragment", "Error checking Huawei auto-start permission", e)
+            true
         }
     }
 

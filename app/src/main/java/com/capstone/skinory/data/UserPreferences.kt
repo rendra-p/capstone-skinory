@@ -20,4 +20,12 @@ class UserPreferences(context: Context) {
     fun areNotificationsEnabled(): Boolean {
         return sharedPreferences.getBoolean("notifications_enabled", false)
     }
+
+    fun isAutoStartPermissionRequested(): Boolean {
+        return sharedPreferences.getBoolean("auto_start_permission_requested", false)
+    }
+
+    fun setAutoStartPermissionRequested(requested: Boolean) {
+        sharedPreferences.edit().putBoolean("auto_start_permission_requested", requested).apply()
+    }
 }
