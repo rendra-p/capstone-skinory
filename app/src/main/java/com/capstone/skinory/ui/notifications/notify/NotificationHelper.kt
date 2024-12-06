@@ -11,8 +11,8 @@ import android.graphics.Color
 import android.os.Build
 import android.util.Log
 import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -20,8 +20,7 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class NotificationHelper(private val context: Context) {
-    private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private val workManager = WorkManager.getInstance(context)
 
     init {
         createNotificationChannel()
@@ -34,28 +33,35 @@ class NotificationHelper(private val context: Context) {
                     DAY_CHANNEL_ID,
                     "Day Skincare Routine",
                     NotificationManager.IMPORTANCE_HIGH
-                ),
+                ).apply {
+                    description = "Skincare Routine Notifications"
+                    enableLights(true)
+                    lightColor = Color.BLUE
+                    enableVibration(true)
+                    vibrationPattern = longArrayOf(100, 200, 300, 400)
+                },
                 NotificationChannel(
                     NIGHT_CHANNEL_ID,
                     "Night Skincare Routine",
                     NotificationManager.IMPORTANCE_HIGH
-                )
+                ).apply {
+                    description = "Skincare Routine Notifications"
+                    enableLights(true)
+                    lightColor = Color.BLUE
+                    enableVibration(true)
+                    vibrationPattern = longArrayOf(100, 200, 300, 400)
+                }
             )
 
-            channels.forEach { channel ->
-                channel.description = "Skincare Routine Notifications"
-                channel.enableLights(true)
-                channel.lightColor = Color.BLUE
-                channel.enableVibration(true)
-
-                notificationManager.createNotificationChannel(channel)
-            }
-
-            Log.d(TAG, "Notification channels created")
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            channels.forEach { notificationManager.createNotificationChannel(it) }
         }
     }
 
     fun scheduleNotifications() {
+        // Batalkan pekerjaan yang sudah ada
+        cancelNotifications()
+
         // Schedule Day Notification at 6 AM
 //        scheduleRoutineNotification(
 //            requestCode = DAY_NOTIFICATION_REQUEST_CODE,
@@ -76,35 +82,26 @@ class NotificationHelper(private val context: Context) {
         scheduleRoutineNotification(
             requestCode = DAY_NOTIFICATION_REQUEST_CODE,
             hour = currentTime.get(Calendar.HOUR_OF_DAY),
-            minute = currentTime.get(Calendar.MINUTE) + 1, // Tambah 1 menit
+            minute = currentTime.get(Calendar.MINUTE),
+            second = currentTime.get(Calendar.SECOND) + 30,
             type = "Day"
         )
         scheduleRoutineNotification(
             requestCode = NIGHT_NOTIFICATION_REQUEST_CODE,
             hour = currentTime.get(Calendar.HOUR_OF_DAY),
-            minute = currentTime.get(Calendar.MINUTE) + 2, // Tambah 2 menit
+            minute = currentTime.get(Calendar.MINUTE),
+            second = currentTime.get(Calendar.SECOND) + 60,
             type = "Night"
         )
     }
 
     @SuppressLint("ScheduleExactAlarm")
-    fun scheduleRoutineNotification(requestCode: Int, hour: Int, minute: Int, type: String) {
-        val intent = Intent(context, NotificationReceiver::class.java).apply {
-            action = "com.capstone.skinory.ROUTINE_NOTIFICATION"
-            putExtra("type", type)
-        }
-
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            requestCode,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+    fun scheduleRoutineNotification(requestCode: Int, hour: Int, minute: Int, second: Int, type: String) {
 
         val calendar = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, hour)
             set(Calendar.MINUTE, minute)
-            set(Calendar.SECOND, 0)
+            set(Calendar.SECOND, second)
             set(Calendar.MILLISECOND, 0)
 
             // If the time has already passed today, schedule for tomorrow
@@ -124,32 +121,34 @@ class NotificationHelper(private val context: Context) {
         Log.d(TAG, "Scheduled Time: $scheduledTime")
         Log.d(TAG, "Current Time: ${sdf.format(Calendar.getInstance().time)}")
 
-        // Gunakan metode alarm yang sesuai
-        try {
-            // Gunakan setAlarmClock untuk kompatibilitas maksimal
-            alarmManager.setAlarmClock(
-                AlarmManager.AlarmClockInfo(calendar.timeInMillis, pendingIntent),
-                pendingIntent
-            )
+        // Hitung delay
+        val delay = calendar.timeInMillis - System.currentTimeMillis()
 
-            Log.d(TAG, "$type Routine Notification scheduled for: ${calendar.time}")
-        } catch (e: SecurityException) {
-            Log.e(TAG, "Security exception when scheduling notification", e)
+        // Buat input data
+        val inputData = Data.Builder()
+            .putString("type", type)
+            .build()
 
-            // Fallback method jika setAlarmClock gagal
-            try {
-                alarmManager.setExactAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    calendar.timeInMillis,
-                    pendingIntent
-                )
-            } catch (ex: Exception) {
-                Log.e(TAG, "Fallback scheduling failed", ex)
-            }
-        }
+        // Buat request WorkManager
+        val workRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
+            .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+            .setInputData(inputData)
+            .addTag(type)
+            .build()
+
+        // Jadwalkan pekerjaan
+        workManager.enqueueUniqueWork(
+            when (type) {
+                "Day" -> NotificationWorker.WORK_NAME_DAY
+                "Night" -> NotificationWorker.WORK_NAME_NIGHT
+                else -> "unknown_routine"
+            },
+            ExistingWorkPolicy.REPLACE,
+            workRequest
+        )
 
         // Additional logging for verification
-        Log.i(TAG, "$type Routine Notification scheduled successfully")
+        Log.d(TAG, "$type Routine Notification scheduled for: ${calendar.time}")
     }
 
     fun cancelNotifications() {
@@ -157,27 +156,10 @@ class NotificationHelper(private val context: Context) {
         Log.d(TAG, "Attempting to cancel all scheduled notifications")
 
         // Batalkan notifikasi yang sudah dijadwalkan
-        val intents = listOf(
-            Pair(DAY_NOTIFICATION_REQUEST_CODE, "Day"),
-            Pair(NIGHT_NOTIFICATION_REQUEST_CODE, "Night")
-        )
+        workManager.cancelAllWorkByTag("Day")
+        workManager.cancelAllWorkByTag("Night")
 
-        intents.forEach { (requestCode, type) ->
-            val intent = Intent(context, NotificationReceiver::class.java).apply {
-                action = "com.capstone.skinory.ROUTINE_NOTIFICATION"
-                putExtra("type", type)
-            }
-
-            val pendingIntent = PendingIntent.getBroadcast(
-                context,
-                requestCode,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-
-            alarmManager.cancel(pendingIntent)
-            Log.d(TAG, "$type Notification cancelled")
-        }
+        Log.d(TAG, "All notification works cancelled")
     }
 
     companion object {

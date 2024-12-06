@@ -32,13 +32,6 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <receiver
-            android:name=".ui.notifications.notify.NotificationReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.capstone.skinory.ROUTINE_NOTIFICATION" />
-            </intent-filter>
-        </receiver>
 
         <activity
             android:name=".ui.home.NewsActivity"
