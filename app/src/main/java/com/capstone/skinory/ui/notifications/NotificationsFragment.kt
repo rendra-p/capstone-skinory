@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
@@ -54,6 +55,20 @@ class NotificationsFragment : Fragment() {
         val viewModelFactory = Injection.provideViewModelFactory(requireContext())
         routineViewModel = ViewModelProvider(this, viewModelFactory)[RoutineViewModel::class.java]
 
+        if (userPreferences.areNotificationsEnabled()) {
+            // Pastikan semua izin terpenuhi
+            if (hasExactAlarmPermission() &&
+                (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+                        ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED)
+            ) {
+                notificationHelper.scheduleNotifications()
+            } else {
+                // Nonaktifkan notifikasi jika izin tidak terpenuhi
+                userPreferences.setNotificationsEnabled(false)
+                binding.switch1.isChecked = false
+            }
+        }
+
         checkAndRequestAlarmPermission()
         hasExactAlarmPermission()
         setupNotificationSwitch()
@@ -73,18 +88,44 @@ class NotificationsFragment : Fragment() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Izin diberikan, lanjutkan dengan penjadwalan notifikasi
-                Log.d("NotificationsFragment", "Notification permission granted")
-                notificationHelper.scheduleNotifications()
-            } else {
-                // Izin ditolak
-                Log.d("NotificationsFragment", "Notification permission denied")
-                // Bisa menampilkan pesan atau dialog ke pengguna
-                binding.switch1.isChecked = false
+        when (requestCode) {
+            NOTIFICATION_PERMISSION_REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Izin diberikan
+                    Log.d("NotificationsFragment", "Notification permission granted")
+
+                    // Pastikan alarm permission juga diizinkan
+                    if (hasExactAlarmPermission()) {
+                        binding.switch1.isChecked = true
+                        notificationHelper.scheduleNotifications()
+                        userPreferences.setNotificationsEnabled(true)
+                    } else {
+                        checkAndRequestAlarmPermission()
+                    }
+                } else {
+                    // Izin ditolak
+                    Log.d("NotificationsFragment", "Notification permission denied")
+                    binding.switch1.isChecked = false
+
+                    // Tampilkan dialog penjelasan
+                    showPermissionRationaleDialog()
+                }
             }
         }
+    }
+
+    private fun showPermissionRationaleDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Izin Diperlukan")
+            .setMessage("Notifikasi dibutuhkan untuk mengingatkan jadwal skincare Anda. Mohon berikan izin.")
+            .setPositiveButton("Buka Pengaturan") { _, _ ->
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                val uri = Uri.fromParts("package", requireContext().packageName, null)
+                intent.data = uri
+                startActivity(intent)
+            }
+            .setNegativeButton("Batal", null)
+            .show()
     }
 
     private fun checkAndRequestAlarmPermission() {
@@ -128,26 +169,72 @@ class NotificationsFragment : Fragment() {
 
     private fun setupNotificationSwitch() {
         binding.switch1.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                // Untuk Android 13+, minta izin terlebih dahulu
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    requestNotificationPermission()
-                } else {
-                    // Untuk versi Android di bawah 13, langsung jadwalkan
+            when {
+                isChecked -> {
+                    // Periksa izin alarm
+                    if (!hasExactAlarmPermission()) {
+                        checkAndRequestAlarmPermission()
+                        binding.switch1.isChecked = false
+                        return@setOnCheckedChangeListener
+                    }
+
+                    // Untuk Android 13+, minta izin notifikasi
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        if (ContextCompat.checkSelfPermission(
+                                requireContext(),
+                                Manifest.permission.POST_NOTIFICATIONS
+                            ) != PackageManager.PERMISSION_GRANTED
+                        ) {
+                            requestNotificationPermission()
+                            binding.switch1.isChecked = false
+                            return@setOnCheckedChangeListener
+                        }
+                    }
+
+                    // Periksa optimasi baterai
+                    checkBatteryOptimization()
+
+                    // Jadwalkan notifikasi
                     notificationHelper.scheduleNotifications()
                     userPreferences.setNotificationsEnabled(true)
+
                     Log.d("NotificationsFragment", "Notifications enabled")
                 }
-            } else {
-                // Matikan notifikasi
-                notificationHelper.cancelNotifications()
-                userPreferences.setNotificationsEnabled(false)
-                Log.d("NotificationsFragment", "Notifications disabled")
+                else -> {
+                    // Matikan notifikasi
+                    notificationHelper.cancelNotifications()
+                    userPreferences.setNotificationsEnabled(false)
+                    Log.d("NotificationsFragment", "Notifications disabled")
+                }
             }
         }
 
         // Set initial switch state from user preferences
         binding.switch1.isChecked = userPreferences.areNotificationsEnabled()
+    }
+
+    private fun checkBatteryOptimization() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val powerManager = requireContext().getSystemService(Context.POWER_SERVICE) as PowerManager
+            val packageName = requireContext().packageName
+
+            if (!powerManager.isIgnoringBatteryOptimizations(packageName)) {
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Optimasi Baterai")
+                    .setMessage("Nonaktifkan optimasi baterai untuk memastikan notifikasi berjalan lancar?")
+                    .setPositiveButton("Buka Pengaturan") { _, _ ->
+                        try {
+                            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                            intent.data = Uri.parse("package:$packageName")
+                            startActivity(intent)
+                        } catch (e: Exception) {
+                            Log.e("NotificationsFragment", "Tidak dapat membuka pengaturan optimasi baterai", e)
+                        }
+                    }
+                    .setNegativeButton("Batal", null)
+                    .show()
+            }
+        }
     }
 
     private fun requestNotificationPermission() {

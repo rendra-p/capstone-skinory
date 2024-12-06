@@ -10,9 +10,13 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.util.Log
+import androidx.work.Constraints
 import androidx.work.Data
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -110,33 +114,33 @@ class NotificationHelper(private val context: Context) {
                 add(Calendar.MINUTE, 1)
             }
         }
+        // Buat constraints untuk pekerjaan
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
+            .setRequiresBatteryNotLow(true)
+            .build()
 
-        // Log detailed scheduling information
-        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        val scheduledTime = sdf.format(calendar.time)
-
-        Log.d(TAG, "Final scheduling details:")
-        Log.d(TAG, "Type: $type")
-        Log.d(TAG, "Request Code: $requestCode")
-        Log.d(TAG, "Scheduled Time: $scheduledTime")
-        Log.d(TAG, "Current Time: ${sdf.format(Calendar.getInstance().time)}")
-
-        // Hitung delay
+        // Hitung delay yang tepat
         val delay = calendar.timeInMillis - System.currentTimeMillis()
 
         // Buat input data
         val inputData = Data.Builder()
             .putString("type", type)
+            .putLong("scheduledTime", calendar.timeInMillis)
             .build()
 
-        // Buat request WorkManager
+        // Buat OneTimeWorkRequest dengan delay yang tepat
         val workRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
             .setInitialDelay(delay, TimeUnit.MILLISECONDS)
             .setInputData(inputData)
+            .setConstraints(constraints)
             .addTag(type)
             .build()
 
-        // Jadwalkan pekerjaan
+        // Batalkan pekerjaan sebelumnya dengan tipe yang sama
+        workManager.cancelAllWorkByTag(type)
+
+        // Jadwalkan pekerjaan baru
         workManager.enqueueUniqueWork(
             when (type) {
                 "Day" -> NotificationWorker.WORK_NAME_DAY
@@ -146,6 +150,13 @@ class NotificationHelper(private val context: Context) {
             ExistingWorkPolicy.REPLACE,
             workRequest
         )
+
+        // Log detail penjadwalan
+        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        Log.d(TAG, "Scheduling $type Notification:")
+        Log.d(TAG, "Scheduled Time: ${sdf.format(calendar.time)}")
+        Log.d(TAG, "Current Time: ${sdf.format(System.currentTimeMillis())}")
+        Log.d(TAG, "Delay: $delay ms")
 
         // Additional logging for verification
         Log.d(TAG, "$type Routine Notification scheduled for: ${calendar.time}")
