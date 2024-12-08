@@ -4,6 +4,8 @@ import android.content.Context
 import com.capstone.skinory.data.remote.response.BestProductResponse
 import com.capstone.skinory.data.remote.response.LoginRequest
 import com.capstone.skinory.data.remote.response.LoginResponse
+import com.capstone.skinory.data.remote.response.PasswordRequest
+import com.capstone.skinory.data.remote.response.PasswordResponse
 import com.capstone.skinory.data.remote.response.ProductsItem
 import com.capstone.skinory.data.remote.response.ProfileResponse
 import com.capstone.skinory.data.remote.response.RegisterRequest
@@ -26,6 +28,17 @@ class DataRepository(private val apiService: ApiService, private val userPrefere
     suspend fun loginUser (loginRequest: LoginRequest): Result<LoginResponse> {
         return try {
             val response = apiService.login(loginRequest)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun editPassword (token: String, passwordRequest: PasswordRequest): Result<PasswordResponse> {
+        val userId = userPreferences.getUserId() ?: throw Exception("User  ID not found")
+        val formattedToken = "Bearer $token"
+        return try {
+            val response = apiService.editPassword(userId, formattedToken, passwordRequest)
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)

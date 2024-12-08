@@ -13,6 +13,7 @@ import com.capstone.skinory.ui.notifications.day.NotifDayViewModel
 import com.capstone.skinory.ui.notifications.night.NotifNightViewModel
 import com.capstone.skinory.ui.register.RegisterViewModel
 import com.capstone.skinory.ui.result.ResultViewModel
+import com.capstone.skinory.ui.settings.SettingsViewModel
 
 class ViewModelFactory(
     private val repository: DataRepository,
@@ -45,6 +46,9 @@ class ViewModelFactory(
             }
             modelClass.isAssignableFrom(SelectProductViewModel::class.java) -> {
                 SelectProductViewModel(repository) as T
+            }
+            modelClass.isAssignableFrom(SettingsViewModel::class.java) -> {
+                SettingsViewModel(repository, userPreferences!!) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class")
         }

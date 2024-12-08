@@ -8,9 +8,11 @@ import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModelProvider
 import com.capstone.skinory.R
 import com.capstone.skinory.data.Injection
+import com.capstone.skinory.data.UserPreferences
 import com.capstone.skinory.databinding.ActivityLoginBinding
 import com.capstone.skinory.ui.analysis.AnalysisActivity
 import com.capstone.skinory.ui.register.RegisterActivity
@@ -23,6 +25,13 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val userPreferences = UserPreferences(this)
+        if (userPreferences.isDarkModeEnabled()) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
 
         val viewModelFactory = Injection.provideViewModelFactory(this)
         viewModel = ViewModelProvider(this, viewModelFactory)[LoginViewModel::class.java]

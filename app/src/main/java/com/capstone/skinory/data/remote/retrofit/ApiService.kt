@@ -3,6 +3,8 @@ package com.capstone.skinory.data.remote.retrofit
 import com.capstone.skinory.data.remote.response.BestProductResponse
 import com.capstone.skinory.data.remote.response.LoginRequest
 import com.capstone.skinory.data.remote.response.LoginResponse
+import com.capstone.skinory.data.remote.response.PasswordRequest
+import com.capstone.skinory.data.remote.response.PasswordResponse
 import com.capstone.skinory.data.remote.response.ProductListResponse
 import com.capstone.skinory.data.remote.response.ProfileResponse
 import com.capstone.skinory.data.remote.response.RegisterRequest
@@ -27,6 +29,13 @@ interface ApiService {
     suspend fun login(
         @Body loginRequest: LoginRequest
     ): LoginResponse
+
+    @POST("/profile/{user_id}")
+    suspend fun editPassword(
+        @Path("user_id") userId: String,
+        @Header("Authorization") token: String,
+        @Body passwordRequest: PasswordRequest
+    ): PasswordResponse
 
     @GET("profile/{user_id}")
     suspend fun getProfile(

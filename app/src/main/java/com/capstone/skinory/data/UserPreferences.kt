@@ -9,6 +9,10 @@ class UserPreferences(context: Context) {
         sharedPreferences.edit().putString("user_id", userId).apply()
     }
 
+    fun removeUserId() {
+        sharedPreferences.edit().remove("user_id").apply()
+    }
+
     fun getUserId(): String? {
         return sharedPreferences.getString("user_id", null)
     }
@@ -27,5 +31,13 @@ class UserPreferences(context: Context) {
 
     fun setAutoStartPermissionRequested(requested: Boolean) {
         sharedPreferences.edit().putBoolean("auto_start_permission_requested", requested).apply()
+    }
+
+    fun setDarkMode(enabled: Boolean) {
+        sharedPreferences.edit().putBoolean("dark_mode", enabled).apply()
+    }
+
+    fun isDarkModeEnabled(): Boolean {
+        return sharedPreferences.getBoolean("dark_mode", false)
     }
 }
