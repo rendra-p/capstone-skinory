@@ -22,7 +22,7 @@ class EmailInputLayout @JvmOverloads constructor(
                     val email = s?.toString() ?: ""
                     if (email.isNotEmpty() && !isValidEmail(email)) {
                         isErrorEnabled = true
-                        error = "Email tidak valid"
+                        error = "Invalid emails"
                     } else {
                         isErrorEnabled = false
                         error = null

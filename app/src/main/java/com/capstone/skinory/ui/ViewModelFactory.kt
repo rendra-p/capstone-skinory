@@ -39,10 +39,10 @@ class ViewModelFactory(
                 RoutineViewModel(repository, tokenDataStore!!) as T
             }
             modelClass.isAssignableFrom(NotifDayViewModel::class.java) -> {
-                NotifDayViewModel(repository) as T
+                NotifDayViewModel() as T
             }
             modelClass.isAssignableFrom(NotifNightViewModel::class.java) -> {
-                NotifNightViewModel(repository) as T
+                NotifNightViewModel() as T
             }
             modelClass.isAssignableFrom(SelectProductViewModel::class.java) -> {
                 SelectProductViewModel(repository) as T

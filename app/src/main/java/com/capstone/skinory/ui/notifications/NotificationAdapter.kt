@@ -9,7 +9,6 @@ import com.capstone.skinory.data.remote.response.GroupedRoutinesItem
 import com.capstone.skinory.databinding.ItemNotificationBinding
 
 class NotificationAdapter(
-    private val viewModel: RoutineViewModel,
     private val onDeleteClick: (GroupedRoutinesItem) -> Unit
 ) : ListAdapter<GroupedRoutinesItem, NotificationAdapter.NotificationViewHolder>(RoutineItemDiffCallback()) {
 

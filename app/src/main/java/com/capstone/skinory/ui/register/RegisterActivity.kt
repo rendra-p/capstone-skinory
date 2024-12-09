@@ -7,15 +7,11 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.capstone.skinory.R
 import com.capstone.skinory.data.Injection
 import com.capstone.skinory.databinding.ActivityRegisterBinding
-import com.capstone.skinory.ui.ViewModelFactory
 import com.capstone.skinory.ui.login.LoginActivity
 
 class RegisterActivity : AppCompatActivity() {
@@ -54,7 +50,6 @@ class RegisterActivity : AppCompatActivity() {
             val email = binding.edRegisterEmail.text.toString()
             val password = binding.edRegisterPassword.text.toString()
 
-            // Validasi input
             if (validateInput(username, email, password)) {
                 viewModel.registerUser(username, email, password)
             }
@@ -84,8 +79,8 @@ class RegisterActivity : AppCompatActivity() {
             isValid = false
         }
 
-        if (password.isEmpty() || password.length < 8) {
-            binding.passwordEditTextLayout.error = "Password must be at least 8 characters"
+        if (password.isEmpty()) {
+            binding.passwordEditTextLayout.error = "Password cannot be empty"
             isValid = false
         }
 
@@ -96,16 +91,13 @@ class RegisterActivity : AppCompatActivity() {
         viewModel.registrationResult.observe(this) { result ->
             result.onSuccess { response ->
                 if (response.error == false) {
-                    // Registrasi berhasil
                     Toast.makeText(this, response.message, Toast.LENGTH_SHORT).show()
                     startActivity(Intent(this, LoginActivity::class.java))
                     finish()
                 } else {
-                    // Registrasi gagal
                     Toast.makeText(this, response.message, Toast.LENGTH_SHORT).show()
                 }
             }.onFailure { exception ->
-                // Tangani error jaringan atau lainnya
                 Toast.makeText(this, "Registration failed: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
         }

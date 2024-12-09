@@ -11,7 +11,6 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel(private val repository: DataRepository, private val tokenDataStore: TokenDataStore) : ViewModel() {
     private val _profileResult = MutableLiveData<Result<ProfileResponse>>()
-    val profileResult: LiveData<Result<ProfileResponse>> = _profileResult
 
     private val _username = MutableLiveData<String>()
     val username: LiveData<String> = _username

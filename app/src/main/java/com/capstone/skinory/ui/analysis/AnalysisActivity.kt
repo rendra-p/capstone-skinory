@@ -82,9 +82,9 @@ class AnalysisActivity : AppCompatActivity() {
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
-            "JPEG_$timeStamp", /* prefix */
-            ".jpg",             /* suffix */
-            storageDir          /* directory */
+            "JPEG_$timeStamp",
+            ".jpg",
+            storageDir
         )
     }
 
@@ -125,7 +125,7 @@ class AnalysisActivity : AppCompatActivity() {
             val compressedBitmap = BitmapFactory.decodeStream(ByteArrayInputStream(outputStream.toByteArray()))
             binding.imgUpload.setImageBitmap(compressedBitmap)
         } else {
-            Toast.makeText(this, "Gagal memuat gambar", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Failed to load the image", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -168,7 +168,7 @@ class AnalysisActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openCamera()
             } else {
-                Toast.makeText(this, "Izin kamera diperlukan", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Camera permission is required", Toast.LENGTH_SHORT).show()
             }
         }
     }

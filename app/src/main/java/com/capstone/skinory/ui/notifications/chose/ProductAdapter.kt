@@ -1,9 +1,7 @@
 package com.capstone.skinory.ui.notifications.chose
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -35,10 +33,8 @@ class ProductAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(product: ProductsItem) {
-            // Set nama produk
             binding.tvProductName.text = product.nameProduct
 
-            // Memuat gambar dengan Glide
             Glide.with(binding.root.context)
                 .load(product.imageUrl)
                 .placeholder(R.drawable.ic_baseline_insert_photo_24)
@@ -46,7 +42,6 @@ class ProductAdapter(
         }
     }
 
-    // Callback untuk membandingkan item di RecyclerView
     class ProductDiffCallback : DiffUtil.ItemCallback<ProductsItem>() {
         override fun areItemsTheSame(oldItem: ProductsItem, newItem: ProductsItem): Boolean {
             return oldItem.idProduct == newItem.idProduct

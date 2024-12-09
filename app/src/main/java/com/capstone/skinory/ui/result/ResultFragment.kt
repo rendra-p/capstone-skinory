@@ -1,7 +1,5 @@
 package com.capstone.skinory.ui.result
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -46,7 +44,6 @@ class ResultFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
             adapter = bestProductAdapter
 
-            // Optional: Tambahkan dekorasi item
             addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
         }
     }

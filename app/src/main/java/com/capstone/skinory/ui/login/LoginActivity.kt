@@ -59,7 +59,6 @@ class LoginActivity : AppCompatActivity() {
             val email = binding.edLoginEmail.text.toString()
             val password = binding.edLoginPassword.text.toString()
 
-            // Validasi input
             if (validateInput(email, password)) {
                 viewModel.login(email, password)
             }
@@ -89,8 +88,8 @@ class LoginActivity : AppCompatActivity() {
             isValid = false
         }
 
-        if (password.isEmpty() || password.length < 8) {
-            binding.passwordEditTextLayout.error = "Password must be at least 8 characters"
+        if (password.isEmpty()) {
+            binding.passwordEditTextLayout.error = "Password cannot be empty"
             isValid = false
         }
 
@@ -100,12 +99,10 @@ class LoginActivity : AppCompatActivity() {
     private fun observeLoginResult() {
         viewModel.loginResult.observe(this) { result ->
             result.onSuccess { response ->
-                // Login berhasil
                 Toast.makeText(this, "Login successful: ${response.message}", Toast.LENGTH_SHORT).show()
                 startActivity(Intent(this, AnalysisActivity::class.java))
                 finish()
             }.onFailure { exception ->
-                // Tangani error login
                 Toast.makeText(this, "Login failed: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
         }

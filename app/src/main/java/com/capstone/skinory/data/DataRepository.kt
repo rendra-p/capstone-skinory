@@ -1,6 +1,5 @@
 package com.capstone.skinory.data
 
-import android.content.Context
 import com.capstone.skinory.data.remote.response.BestProductResponse
 import com.capstone.skinory.data.remote.response.LoginRequest
 import com.capstone.skinory.data.remote.response.LoginResponse
@@ -12,8 +11,6 @@ import com.capstone.skinory.data.remote.response.RegisterRequest
 import com.capstone.skinory.data.remote.response.RegisterResponse
 import com.capstone.skinory.data.remote.response.RoutineListResponse
 import com.capstone.skinory.data.remote.retrofit.ApiService
-import com.capstone.skinory.ui.login.TokenDataStore
-import kotlinx.coroutines.flow.first
 
 class DataRepository(private val apiService: ApiService, private val userPreferences: UserPreferences) {
     suspend fun registerUser(registerRequest: RegisterRequest): Result<RegisterResponse> {
@@ -94,7 +91,7 @@ class DataRepository(private val apiService: ApiService, private val userPrefere
         val formattedToken = "Bearer $token"
         val response = apiService.getProductsByCategory(userId, category, formattedToken)
         if (response.isSuccessful) {
-            return response.body()?.products?.filterNotNull() ?: emptyList()
+            return response.body()?.products ?: emptyList()
         } else {
             throw Exception("Error fetching products")
         }

@@ -16,21 +16,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.capstone.skinory.data.Injection
 import com.capstone.skinory.data.UserPreferences
 import com.capstone.skinory.data.remote.response.GroupedRoutinesItem
 import com.capstone.skinory.databinding.FragmentNotificationsBinding
-import com.capstone.skinory.ui.ViewModelFactory
-import com.capstone.skinory.ui.login.LoginViewModel
 import com.capstone.skinory.ui.notifications.chose.ChoseActivity
 import com.capstone.skinory.ui.notifications.notify.NotificationHelper
 import java.util.Locale
@@ -58,14 +52,12 @@ class NotificationsFragment : Fragment() {
         routineViewModel = ViewModelProvider(this, viewModelFactory)[RoutineViewModel::class.java]
 
         if (userPreferences.areNotificationsEnabled()) {
-            // Pastikan semua izin terpenuhi
             if (hasExactAlarmPermission() &&
                 (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
                         ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED)
             ) {
                 notificationHelper.scheduleNotifications()
             } else {
-                // Nonaktifkan notifikasi jika izin tidak terpenuhi
                 userPreferences.setNotificationsEnabled(false)
                 binding.switchNotification.isChecked = false
             }
@@ -77,8 +69,6 @@ class NotificationsFragment : Fragment() {
         setupRecyclerView()
         observeRoutines()
         setupFloatingActionButton()
-
-        // Fetch routines when fragment is created
         routineViewModel.fetchRoutines()
 
         return binding.root
@@ -93,10 +83,8 @@ class NotificationsFragment : Fragment() {
         when (requestCode) {
             NOTIFICATION_PERMISSION_REQUEST_CODE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Izin diberikan
                     Log.d("NotificationsFragment", "Notification permission granted")
 
-                    // Pastikan alarm permission juga diizinkan
                     if (hasExactAlarmPermission()) {
                         binding.switchNotification.isChecked = true
                         notificationHelper.scheduleNotifications()
@@ -105,11 +93,9 @@ class NotificationsFragment : Fragment() {
                         checkAndRequestAlarmPermission()
                     }
                 } else {
-                    // Izin ditolak
                     Log.d("NotificationsFragment", "Notification permission denied")
                     binding.switchNotification.isChecked = false
 
-                    // Tampilkan dialog penjelasan
                     showPermissionRationaleDialog()
                 }
             }
@@ -118,15 +104,15 @@ class NotificationsFragment : Fragment() {
 
     private fun showPermissionRationaleDialog() {
         AlertDialog.Builder(requireContext())
-            .setTitle("Izin Diperlukan")
-            .setMessage("Notifikasi dibutuhkan untuk mengingatkan jadwal skincare Anda. Mohon berikan izin.")
-            .setPositiveButton("Buka Pengaturan") { _, _ ->
+            .setTitle("Permission Required")
+            .setMessage("Notifications are required to remind you of your skin care schedule. Please provide permission.")
+            .setPositiveButton("Open Settings") { _, _ ->
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                 val uri = Uri.fromParts("package", requireContext().packageName, null)
                 intent.data = uri
                 startActivity(intent)
             }
-            .setNegativeButton("Batal", null)
+            .setNegativeButton("Cancel", null)
             .show()
     }
 
@@ -135,25 +121,22 @@ class NotificationsFragment : Fragment() {
             val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
             if (!alarmManager.canScheduleExactAlarms()) {
                 try {
-                    // Tampilkan dialog untuk meminta izin
                     AlertDialog.Builder(requireContext())
-                        .setTitle("Izin Alarm Diperlukan")
-                        .setMessage("Aplikasi membutuhkan izin untuk menjadwalkan alarm tepat. Buka pengaturan?")
-                        .setPositiveButton("Buka Pengaturan") { _, _ ->
-                            // Buka pengaturan sistem untuk mengizinkan exact alarm
+                        .setTitle("Permission Required")
+                        .setMessage("The application needs permission to schedule proper alarms. Go to Settings?")
+                        .setPositiveButton("Open Settings") { _, _ ->
                             val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
                             startActivity(intent)
                         }
-                        .setNegativeButton("Batal", null)
+                        .setNegativeButton("Cancel", null)
                         .show()
                 } catch (e: ActivityNotFoundException) {
-                    // Fallback jika intent tidak tersedia
                     try {
                         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                         intent.data = Uri.parse("package:${requireContext().packageName}")
                         startActivity(intent)
                     } catch (ex: Exception) {
-                        Log.e("NotificationsFragment", "Tidak dapat membuka pengaturan", ex)
+                        Log.e("NotificationsFragment", "Unable to open settings", ex)
                     }
                 }
             }
@@ -165,7 +148,7 @@ class NotificationsFragment : Fragment() {
             val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
             alarmManager.canScheduleExactAlarms()
         } else {
-            true // Untuk versi Android di bawah 12, izin tidak diperlukan
+            true
         }
     }
 
@@ -176,14 +159,13 @@ class NotificationsFragment : Fragment() {
                     if (!userPreferences.isAutoStartPermissionRequested()) {
                         checkAutoStartPermission()
                     }
-                    // Periksa izin alarm
+
                     if (!hasExactAlarmPermission()) {
                         checkAndRequestAlarmPermission()
                         binding.switchNotification.isChecked = false
                         return@setOnCheckedChangeListener
                     }
 
-                    // Untuk Android 13+, minta izin notifikasi
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         if (ContextCompat.checkSelfPermission(
                                 requireContext(),
@@ -196,17 +178,14 @@ class NotificationsFragment : Fragment() {
                         }
                     }
 
-                    // Periksa optimasi baterai
                     checkBatteryOptimization()
 
-                    // Jadwalkan notifikasi
                     notificationHelper.scheduleNotifications()
                     userPreferences.setNotificationsEnabled(true)
 
                     Log.d("NotificationsFragment", "Notifications enabled")
                 }
                 else -> {
-                    // Matikan notifikasi
                     notificationHelper.cancelNotifications()
                     userPreferences.setNotificationsEnabled(false)
                     userPreferences.setAutoStartPermissionRequested(false)
@@ -215,7 +194,6 @@ class NotificationsFragment : Fragment() {
             }
         }
 
-        // Set initial switch state from user preferences
         binding.switchNotification.isChecked = userPreferences.areNotificationsEnabled()
     }
 
@@ -226,18 +204,18 @@ class NotificationsFragment : Fragment() {
 
             if (!powerManager.isIgnoringBatteryOptimizations(packageName)) {
                 AlertDialog.Builder(requireContext())
-                    .setTitle("Optimasi Baterai")
-                    .setMessage("Nonaktifkan optimasi baterai untuk memastikan notifikasi berjalan lancar?")
-                    .setPositiveButton("Buka Pengaturan") { _, _ ->
+                    .setTitle("Battery Optimization")
+                    .setMessage("Disable battery optimization to ensure notifications run smoothly?")
+                    .setPositiveButton("Open Settings") { _, _ ->
                         try {
                             val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
                             intent.data = Uri.parse("package:$packageName")
                             startActivity(intent)
                         } catch (e: Exception) {
-                            Log.e("NotificationsFragment", "Tidak dapat membuka pengaturan optimasi baterai", e)
+                            Log.e("NotificationsFragment", "Unable to open battery optimization settings", e)
                         }
                     }
-                    .setNegativeButton("Batal", null)
+                    .setNegativeButton("Cancel", null)
                     .show()
             }
         }
@@ -259,9 +237,7 @@ class NotificationsFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        // Inisialisasi notificationAdapter terlebih dahulu
         notificationAdapter = NotificationAdapter(
-            viewModel = routineViewModel,
             onDeleteClick = { routine ->
                 AlertDialog.Builder(requireContext())
                     .setTitle("Delete Routine")
@@ -274,7 +250,6 @@ class NotificationsFragment : Fragment() {
             }
         )
 
-        // Setelah menginisialisasi notificationAdapter, atur adapter untuk RecyclerView
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.adapter = notificationAdapter
     }
@@ -293,7 +268,6 @@ class NotificationsFragment : Fragment() {
 
                 notificationAdapter.submitList(combinedRoutines)
 
-                // Enable/disable FloatingActionButton based on active routines
                 updateFloatingActionButtonState(combinedRoutines.size)
             }
         }
@@ -306,7 +280,6 @@ class NotificationsFragment : Fragment() {
 
     private fun setupFloatingActionButton() {
         binding.floatingActionButton.setOnClickListener {
-            // Only allow adding new routine if less than 2 active routines
             startActivity(Intent(requireContext(), ChoseActivity::class.java))
         }
     }
@@ -322,9 +295,9 @@ class NotificationsFragment : Fragment() {
 
     private fun showAutoStartPermissionDialog() {
         AlertDialog.Builder(requireContext())
-            .setTitle("Izin Auto-Start")
-            .setMessage("Untuk memastikan notifikasi berjalan lancar, mohon izinkan aplikasi untuk berjalan di latar belakang.")
-            .setPositiveButton("Buka Pengaturan") { _, _ ->
+            .setTitle("Auto-Start Permission")
+            .setMessage("To ensure notifications run smoothly, please allow the app to run in the background.")
+            .setPositiveButton("Open Settings") { _, _ ->
                 try {
                     val manufacturer = Build.MANUFACTURER.lowercase(Locale.getDefault())
                     when (manufacturer) {
@@ -335,10 +308,9 @@ class NotificationsFragment : Fragment() {
                         else -> openGenericAutoStartSettings()
                     }
 
-                    // Tandai bahwa izin auto-start telah diminta
                     userPreferences.setAutoStartPermissionRequested(true)
                 } catch (e: Exception) {
-                    Log.e("NotificationsFragment", "Tidak dapat membuka pengaturan auto-start", e)
+                    Log.e("NotificationsFragment", "Unable to open auto-start settings", e)
                 }
             }
             .setNegativeButton("Batal", null)
@@ -394,7 +366,7 @@ class NotificationsFragment : Fragment() {
     }
 
     private fun isAutoStartPermissionRequired(manufacturer: String): Boolean {
-        return listOf("xiaomi", "oppo", "vivo", "huawei", "letv", "honor")
+        return listOf("xiaomi", "oppo", "vivo", "huawei")
             .contains(manufacturer)
     }
 

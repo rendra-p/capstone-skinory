@@ -3,10 +3,7 @@ package com.capstone.skinory.ui.home
 import android.content.Intent
 import android.net.Uri
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -39,15 +36,12 @@ class NewsAdapter : ListAdapter<ArticlesItem, NewsAdapter.NewsViewHolder>(NewsDi
             binding.tvItemTitle.text = article.title
             binding.tvItemPublishedDate.text = formatDate(article.publishedAt)
 
-            // Load image using Glide or Picasso
             Glide.with(binding.root)
                 .load(article.urlToImage)
                 .placeholder(R.drawable.ic_baseline_insert_photo_24)
                 .into(binding.imgPoster)
 
-            // Optional: Add click listener to open article
             binding.root.setOnClickListener {
-                // Open article in browser or webview
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(article.url))
                 binding.root.context.startActivity(intent)
             }

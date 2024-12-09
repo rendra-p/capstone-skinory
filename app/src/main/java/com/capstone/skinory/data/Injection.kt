@@ -12,15 +12,15 @@ object Injection {
     }
 
     private fun provideUserRepository(context: Context, tokenDataStore: TokenDataStore): DataRepository {
-        val apiService = ApiConfig.getApiService(tokenDataStore) // Pass the tokenDataStore here
+        val apiService = ApiConfig.getApiService(tokenDataStore)
         val userPreferences = UserPreferences(context)
         return DataRepository(apiService, userPreferences)
     }
 
     fun provideViewModelFactory(context: Context): ViewModelProvider.Factory {
         val tokenDataStore = provideTokenDataStore(context)
-        val repository = provideUserRepository(context, tokenDataStore) // Pass tokenDataStore here
-        val userPreferences = UserPreferences(context) // Only create once
+        val repository = provideUserRepository(context, tokenDataStore)
+        val userPreferences = UserPreferences(context)
         return ViewModelFactory(repository, tokenDataStore, userPreferences)
     }
 }

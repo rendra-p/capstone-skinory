@@ -25,23 +25,21 @@ class RoutineViewModel(
             tokenDataStore.token.collect { token ->
                 token?.let {
                     try {
-                        // Fetch day routines
                         val dayResponse = repository.getDayRoutines(it)
                         dayResponse.onSuccess { response ->
-                            _dayRoutines.value = response.routines?.map { routine ->
-                                routine?.copy(applied = "Day") // Secara eksplisit set applied ke "Day"
-                            }?.filterNotNull() ?: emptyList()
+                            _dayRoutines.value = response.routines?.mapNotNull { routine ->
+                                routine?.copy(applied = "Day")
+                            } ?: emptyList()
                         }
 
-                        // Fetch night routines
                         val nightResponse = repository.getNightRoutines(it)
                         nightResponse.onSuccess { response ->
-                            _nightRoutines.value = response.routines?.map { routine ->
-                                routine?.copy(applied = "Night") // Secara eksplisit set applied ke "Night"
-                            }?.filterNotNull() ?: emptyList()
+                            _nightRoutines.value = response.routines?.mapNotNull { routine ->
+                                routine?.copy(applied = "Night")
+                            } ?: emptyList()
                         }
                     } catch (e: Exception) {
-                        // Handle error
+                        Log.e("RoutineViewModel", "Fetch routine error", e)
                     }
                 }
             }
@@ -59,10 +57,8 @@ class RoutineViewModel(
                             repository.deleteNightRoutine(token)
                         }
                         result.onSuccess {
-                            // Refresh routines after deletion
                             fetchRoutines()
                         }.onFailure { exception ->
-                            // Handle error
                             Log.e("RoutineViewModel", "Delete routine error", exception)
                         }
                     } catch (e: Exception) {

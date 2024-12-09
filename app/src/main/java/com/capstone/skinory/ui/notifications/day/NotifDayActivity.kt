@@ -18,36 +18,29 @@ class NotifDayActivity : AppCompatActivity() {
         binding = ActivityNotifDayBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Setup ViewModel
         val viewModelFactory = Injection.provideViewModelFactory(this)
         viewModel = ViewModelProvider(this, viewModelFactory)[NotifDayViewModel::class.java]
 
-        // Set click listeners for select buttons
         setupButtonListeners()
     }
 
     private fun setupButtonListeners() {
-        // Face Wash
         binding.btnFacewash.setOnClickListener {
             navigateToSelectProduct("facewash")
         }
 
-        // Sunscreen
         binding.btnSunscreen.setOnClickListener {
             navigateToSelectProduct("sunscreen")
         }
 
-        // Moisturizer
         binding.btnMoisturizer.setOnClickListener {
             navigateToSelectProduct("moisturizer")
         }
 
-        // Toner
         binding.btnToner.setOnClickListener {
             navigateToSelectProduct("toner")
         }
 
-        // Save button
         binding.btnDone.setOnClickListener {
             navigateToMainActivity()
         }

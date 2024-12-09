@@ -12,16 +12,13 @@ class SettingsViewModel(
     private val userPreferences: UserPreferences
 ) : ViewModel() {
 
-    // Fungsi untuk update password
     suspend fun updatePassword(token: String, passwordRequest: PasswordRequest): Result<PasswordResponse> {
         return dataRepository.editPassword(token, passwordRequest)
     }
 
-    // Fungsi untuk mengatur dark mode
     fun setDarkMode(enabled: Boolean) {
         userPreferences.setDarkMode(enabled)
 
-        // Terapkan tema
         if (enabled) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         } else {

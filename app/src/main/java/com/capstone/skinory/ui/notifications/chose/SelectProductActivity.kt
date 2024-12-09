@@ -2,32 +2,16 @@ package com.capstone.skinory.ui.notifications.chose
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
-import com.capstone.skinory.R
 import com.capstone.skinory.data.Injection
-import com.capstone.skinory.data.remote.response.ProductsItem
 import com.capstone.skinory.databinding.ActivitySelectProductBinding
-import com.capstone.skinory.ui.login.LoginActivity
 import com.capstone.skinory.ui.login.TokenDataStore
-import com.capstone.skinory.ui.notifications.day.NotifDayViewModel
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 
 class SelectProductActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySelectProductBinding
@@ -46,27 +30,19 @@ class SelectProductActivity : AppCompatActivity() {
         val category = intent.getStringExtra("CATEGORY") ?: return
         routineType = intent.getStringExtra("ROUTINE_TYPE") ?: "day"
 
-        // Setup ViewModel
         val viewModelFactory = Injection.provideViewModelFactory(this)
         viewModel = ViewModelProvider(this, viewModelFactory)[SelectProductViewModel::class.java]
 
-        // Setup RecyclerView
         setupRecyclerView()
-
-        // Observe ViewModel states
         observeViewModelStates()
-
-        // Fetch products
         fetchTokenAndProducts(category)
     }
 
     private fun observeViewModelStates() {
-        // Observe loading state
         viewModel.isLoading.observe(this) { isLoading ->
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
         }
 
-        // Observe products result
         viewModel.productsResult.observe(this) { result ->
             result.onSuccess { products ->
                 if (products.isNotEmpty()) {
@@ -77,11 +53,10 @@ class SelectProductActivity : AppCompatActivity() {
                     showEmptyState()
                 }
             }.onFailure { exception ->
-                // Handle error
+                Toast.makeText(this, "An error has occurred: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
         }
 
-        // Observe save routine result based on routine type
         if (routineType == "day") {
             viewModel.saveRoutineDayResult.observe(this) { result ->
                 result.onSuccess {
@@ -129,7 +104,6 @@ class SelectProductActivity : AppCompatActivity() {
                         if (product.category != null && product.idProduct != null) {
                             val selectedProducts = mapOf(product.category to product.idProduct)
 
-                            // Pilih metode save berdasarkan routineType
                             if (routineType == "day") {
                                 viewModel.saveRoutineDay(
                                     category = product.category,
@@ -146,14 +120,13 @@ class SelectProductActivity : AppCompatActivity() {
                                 )
                             }
 
-                            // Return "Selected" as the product name
                             val resultIntent = Intent().apply {
                                 putExtra("PRODUCT_NAME", "Selected")
                                 putExtra("CATEGORY", product.category)
                                 putExtra("PRODUCT_ID", product.idProduct)
                             }
                             setResult(RESULT_OK, resultIntent)
-                            finish() // Close the activity
+                            finish()
                         } else {
                             Toast.makeText(this@SelectProductActivity, "Product category or ID is null", Toast.LENGTH_SHORT).show()
                         }

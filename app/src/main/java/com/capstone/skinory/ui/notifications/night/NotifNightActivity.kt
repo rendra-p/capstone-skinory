@@ -18,31 +18,25 @@ class NotifNightActivity : AppCompatActivity() {
         binding = ActivityNotifNightBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Setup ViewModel
         val viewModelFactory = Injection.provideViewModelFactory(this)
         viewModel = ViewModelProvider(this, viewModelFactory)[NotifNightViewModel::class.java]
 
-        // Set click listeners for select buttons
         setupButtonListeners()
     }
 
     private fun setupButtonListeners() {
-        // Face Wash
         binding.btnFacewash.setOnClickListener {
             navigateToSelectProduct("facewash")
         }
 
-        // Moisturizer
         binding.btnMoisturizer.setOnClickListener {
             navigateToSelectProduct("moisturizer")
         }
 
-        // Toner
         binding.btnToner.setOnClickListener {
             navigateToSelectProduct("toner")
         }
 
-        // Save button
         binding.btnDone.setOnClickListener {
             navigateToMainActivity()
         }

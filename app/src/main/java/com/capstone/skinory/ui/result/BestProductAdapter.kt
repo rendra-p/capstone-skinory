@@ -12,8 +12,6 @@ import com.bumptech.glide.Glide
 import com.capstone.skinory.R
 import com.capstone.skinory.data.remote.response.BestProductsItem
 import com.capstone.skinory.databinding.ItemBestProductBinding
-import java.text.NumberFormat
-import java.util.Locale
 
 class BestProductAdapter : ListAdapter<BestProductsItem, BestProductAdapter.ViewHolder>(DiffCallback()) {
 
@@ -21,11 +19,9 @@ class BestProductAdapter : ListAdapter<BestProductsItem, BestProductAdapter.View
         @SuppressLint("DefaultLocale")
         fun bind(product: BestProductsItem) {
             binding.apply {
-                // Nama produk
                 tvProductName.text = product.category ?: "No Category"
                 tvName.text = product.nameProduct ?: "Unnamed Product"
 
-                // Harga - format dengan 2 desimal
                 tvPrice.text = try {
                     val price = product.price?.replace(",", "")?.toFloat() ?: 0f
                     "Rp ${String.format("%,.0f", price)}"
@@ -33,7 +29,6 @@ class BestProductAdapter : ListAdapter<BestProductsItem, BestProductAdapter.View
                     "Price not available"
                 }
 
-                // Rating - format dengan 1 desimal
                 tvRating.text = try {
                     val rating = product.rating?.toFloat() ?: 0f
                     String.format("%.1f", rating)
@@ -41,13 +36,11 @@ class BestProductAdapter : ListAdapter<BestProductsItem, BestProductAdapter.View
                     "No rating"
                 }
 
-                // Gambar produk
                 Glide.with(itemView.context)
                     .load(product.imageUrl)
                     .placeholder(R.drawable.ic_baseline_insert_photo_24)
                     .into(imgProduct)
 
-                // Optional: Set click listener untuk membuka store URL
                 root.setOnClickListener {
                     product.storeUrl?.let { url ->
                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
@@ -71,7 +64,6 @@ class BestProductAdapter : ListAdapter<BestProductsItem, BestProductAdapter.View
         holder.bind(getItem(position))
     }
 
-    // DiffCallback untuk optimasi RecyclerView
     class DiffCallback : DiffUtil.ItemCallback<BestProductsItem>() {
         override fun areItemsTheSame(
             oldItem: BestProductsItem,

@@ -3,12 +3,8 @@ package com.capstone.skinory.ui.notifications.chose
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
-import com.capstone.skinory.R
 import com.capstone.skinory.data.Injection
 import com.capstone.skinory.databinding.ActivityChoseBinding
 import com.capstone.skinory.ui.notifications.RoutineViewModel
@@ -24,7 +20,6 @@ class ChoseActivity : AppCompatActivity() {
         binding = ActivityChoseBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Inisialisasi ViewModel
         val viewModelFactory = Injection.provideViewModelFactory(this)
         routineViewModel = ViewModelProvider(this, viewModelFactory)[RoutineViewModel::class.java]
 

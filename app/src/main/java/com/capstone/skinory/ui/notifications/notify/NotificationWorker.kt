@@ -12,7 +12,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.capstone.skinory.R
 import com.capstone.skinory.data.UserPreferences
-import java.util.Calendar
 import kotlin.math.abs
 
 class NotificationWorker(
@@ -24,23 +23,16 @@ class NotificationWorker(
         val type = inputData.getString("type") ?: return Result.failure()
         val scheduledTime = inputData.getLong("scheduledTime", 0)
 
-        // Periksa apakah waktu sekarang sesuai dengan waktu yang dijadwalkan
         val currentTime = System.currentTimeMillis()
         val timeDifference = abs(currentTime - scheduledTime)
 
-        // Toleransi 5 menit (300000 ms)
         if (timeDifference > 300000) {
             Log.d("NotificationWorker", "Skipping notification. Time mismatch.")
             return Result.success()
         }
 
-        // Pastikan channel dibuat
         createNotificationChannel(applicationContext)
-
-        // Tampilkan notifikasi
         showNotification(applicationContext, type)
-
-        // Jadwalkan ulang notifikasi
         scheduleNextNotification(applicationContext, type)
 
         return Result.success()

@@ -22,11 +22,11 @@ class PasswordInputLayout @JvmOverloads constructor(
                     when {
                         password.isNotEmpty() && !password.first().isUpperCase() -> {
                             isErrorEnabled = true
-                            error = "Password harus diawali huruf besar"
+                            error = "Password must begin with an uppercase letter"
                         }
                         password.isNotEmpty() && password.length < 8 -> {
                             isErrorEnabled = true
-                            error = "Password minimal 8 karakter"
+                            error = "Password must be at least 8 characters"
                         }
                         else -> {
                             isErrorEnabled = false
