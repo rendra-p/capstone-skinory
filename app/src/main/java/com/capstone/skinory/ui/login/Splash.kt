@@ -1,19 +1,28 @@
 package com.capstone.skinory.ui.login
 
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.capstone.skinory.data.UserPreferences
+import com.capstone.skinory.data.remote.retrofit.ApiConfig
+import com.capstone.skinory.data.remote.retrofit.ApiService
 import com.capstone.skinory.ui.MainActivity
 import com.capstone.skinory.databinding.ActivitySplashBinding
 import com.capstone.skinory.ui.analysis.AnalysisActivity
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 @Suppress("DEPRECATION")
 class Splash : AppCompatActivity() {
     private lateinit var binding: ActivitySplashBinding
     private lateinit var tokenDataStore: TokenDataStore
+    private lateinit var userPreferences: UserPreferences
+    private lateinit var apiService: ApiService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,25 +31,105 @@ class Splash : AppCompatActivity() {
         supportActionBar?.hide()
 
         tokenDataStore = TokenDataStore.getInstance(this)
+        userPreferences = UserPreferences(this)
+        apiService = ApiConfig.getApiService(tokenDataStore)
 
         Handler().postDelayed({
             checkToken()
-            finish()
         }, 2000)
     }
 
     private fun checkToken() {
         lifecycleScope.launch {
-            tokenDataStore.token.collect { token ->
-                if (!token.isNullOrEmpty()) {
-                    startActivity(Intent(this@Splash, MainActivity::class.java))
-//                    startActivity(Intent(this@Splash, AnalysisActivity::class.java))
-                    finish()
+            try {
+                if (!isInternetAvailable()) {
+                    navigateToErrorActivity("no_internet")
+                    return@launch
                 }
-                else{
-                    startActivity(Intent(this@Splash, LoginActivity::class.java))
+
+                tokenDataStore.token.collect { token ->
+                    if (!token.isNullOrEmpty()) {
+                        val userId = userPreferences.getUserId()
+
+                        if (userId != null) {
+                            val result = validateToken(userId, token)
+
+                            if (result) {
+                                navigateToAnalysisActivity()
+                            } else {
+//                                navigateToLoginActivity()
+                                navigateToAnalysisActivity()
+                            }
+                        } else {
+                            navigateToLoginActivity()
+                        }
+                    } else {
+                        navigateToLoginActivity()
+                    }
+                }
+            } catch (e: Exception) {
+                navigateToErrorActivity("unknown", e.message)
+            }
+        }
+    }
+
+    private suspend fun validateToken(userId: String, token: String): Boolean {
+        return try {
+            val formattedToken = "Bearer $token"
+
+            apiService.getProfile(userId, formattedToken)
+
+            true
+        } catch (e: HttpException) {
+            when (e.code()) {
+                403, 401 -> {
+                    tokenDataStore.clearToken()
+                    false
+                }
+                else -> {
+                    false
                 }
             }
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    private fun navigateToAnalysisActivity() {
+        startActivity(Intent(this, MainActivity::class.java))
+//        startActivity(Intent(this, AnalysisActivity::class.java))
+        finish()
+    }
+
+    private fun navigateToLoginActivity() {
+        startActivity(Intent(this, LoginActivity::class.java))
+        finish()
+    }
+
+    private fun navigateToErrorActivity(
+        errorType: String,
+        errorMessage: String? = null
+    ) {
+        startActivity(Intent(this, ErrorActivity::class.java).apply {
+            putExtra("error_type", errorType)
+            errorMessage?.let {
+                putExtra("error_message", it)
+            }
+        })
+        finish()
+    }
+
+    private fun isInternetAvailable(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        val network = connectivityManager.activeNetwork ?: return false
+        val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+
+        return when {
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+            else -> false
         }
     }
 }
