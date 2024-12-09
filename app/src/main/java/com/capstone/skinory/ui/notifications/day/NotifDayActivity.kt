@@ -33,22 +33,22 @@ class NotifDayActivity : AppCompatActivity() {
         }
 
         // Sunscreen
-        binding.button3.setOnClickListener {
+        binding.btnSunscreen.setOnClickListener {
             navigateToSelectProduct("sunscreen")
         }
 
         // Moisturizer
-        binding.button4.setOnClickListener {
+        binding.btnMoisturizer.setOnClickListener {
             navigateToSelectProduct("moisturizer")
         }
 
         // Toner
-        binding.button5.setOnClickListener {
+        binding.btnToner.setOnClickListener {
             navigateToSelectProduct("toner")
         }
 
         // Save button
-        binding.button6.setOnClickListener {
+        binding.btnDone.setOnClickListener {
             navigateToMainActivity()
         }
     }
@@ -83,15 +83,15 @@ class NotifDayActivity : AppCompatActivity() {
                     viewModel.setSelectedProduct("facewash", productId)
                 }
                 "sunscreen" -> {
-                    binding.button3.text = productName
+                    binding.btnSunscreen.text = productName
                     viewModel.setSelectedProduct("sunscreen", productId)
                 }
                 "moisturizer" -> {
-                    binding.button4.text = productName
+                    binding.btnMoisturizer.text = productName
                     viewModel.setSelectedProduct("moisturizer", productId)
                 }
                 "toner" -> {
-                    binding.button5.text = productName
+                    binding.btnToner.text = productName
                     viewModel.setSelectedProduct("toner", productId)
                 }
             }

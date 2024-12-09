@@ -37,13 +37,13 @@ class NotificationAdapter(
             routine: GroupedRoutinesItem,
             onDeleteClick: () -> Unit
         ) {
-            binding.textView.text = routine.applied
+            binding.tvUsage.text = routine.applied
 
-            binding.textView3.text = routine.products.mapIndexed { index, product ->
+            binding.tvNotificationProduct.text = routine.products.mapIndexed { index, product ->
                 "${index + 1}. $product"
             }.joinToString("\n")
 
-            binding.imageButton.setOnClickListener {
+            binding.imgbtnDelete.setOnClickListener {
                 onDeleteClick()
             }
         }

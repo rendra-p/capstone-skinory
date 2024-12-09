@@ -5,32 +5,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment"
-    android:background="@color/light_secondary_variant">
+    android:background="?attr/colorSecondaryVariant">
 
     <ImageView
         android:id="@+id/imageView4"
         android:layout_width="72dp"
         android:layout_height="72dp"
-        android:layout_marginStart="40dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:src="@drawable/ic_baseline_account_circle_24"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/textView5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
+        android:layout_marginStart="10dp"
         android:text="@string/hello_username"
         android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="@+id/imageView4"
-        app:layout_constraintTop_toBottomOf="@+id/imageView4" />
+        app:layout_constraintStart_toEndOf="@+id/imageView4"
+        app:layout_constraintTop_toTopOf="@+id/imageView4" />
 
     <TextView
         android:id="@+id/textView6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
         android:text="@string/greed_main"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="@+id/textView5"
@@ -40,7 +42,7 @@
         android:id="@+id/view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="35dp"
+        android:layout_marginTop="30dp"
         android:background="@drawable/main_bg"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -53,8 +55,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:text="@string/skin_type_result"
-        android:textSize="28sp"
+        android:textSize="24sp"
         android:textAlignment="center"
+        android:fontFamily="@font/nunito_semibold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/view" />
@@ -65,7 +68,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginHorizontal="20dp"
-        android:text="If there any miss information consider take another picture"
+        android:text="@string/info_warning"
+        android:textSize="12sp"
+        android:textAlignment="center"
+        android:fontFamily="@font/nunito_light"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView7" />
@@ -75,7 +81,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -87,7 +93,7 @@
             android:layout_height="40dp"
             android:layout_weight="1"
             android:background="@drawable/round_btn"
-            android:text="My Result" />
+            android:text="@string/btn_result" />
 
         <TextView
             android:id="@+id/textView10"
@@ -95,7 +101,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/or"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            android:textStyle="italic"/>
 
         <Button
             android:id="@+id/button7"
@@ -103,22 +110,22 @@
             android:layout_height="40dp"
             android:layout_weight="1"
             android:background="@drawable/round_btn"
-            android:text="My Picture" />
+            android:text="@string/btn_picture" />
     </LinearLayout>
 
     <View
         android:id="@+id/view2"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="3dp"
         android:layout_marginTop="20dp"
-        android:background="@color/light_secondary"
+        android:background="@color/grey"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout"/>
 
     <LinearLayout
         android:id="@+id/linearLayout5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="@+id/view"
         app:layout_constraintStart_toStartOf="@+id/view"
@@ -143,14 +150,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/btntv_seemore"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            android:textStyle="italic"/>
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
         android:layout_marginHorizontal="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

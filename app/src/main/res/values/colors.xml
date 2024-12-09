@@ -2,24 +2,25 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="grey">#878584</color>
     <color name="blue_click">#3B67B1</color>
     <color name="red_warning">#990C0C</color>
 
-<!--    <color name="light_primary">#385e78</color>-->
-<!--    <color name="light_primary_variant">#5bb3ba</color>-->
-<!--    <color name="light_secondary">#efa78e</color>-->
-<!--    <color name="light_secondary_variant">#fbd7d0</color>-->
-<!--    <color name="dark_primary">#1e3948</color>-->
-<!--    <color name="dark_primary_variant">#3d868a</color>-->
-<!--    <color name="dark_secondary">#c47765</color>-->
-<!--    <color name="dark_secondary_variant">#d6aaa3</color>-->
+    <color name="light_primary">#385e78</color>
+    <color name="light_primary_variant">#5bb3ba</color>
+    <color name="light_secondary">#efa78e</color>
+    <color name="light_secondary_variant">#fbd7d0</color>
+    <color name="dark_primary">#1e3948</color>
+    <color name="dark_primary_variant">#3d868a</color>
+    <color name="dark_secondary">#c47765</color>
+    <color name="dark_secondary_variant">#d6aaa3</color>
 
-    <color name="light_primary">#243642</color>
-    <color name="light_primary_variant">#387478</color>
-    <color name="light_secondary">#629584</color>
-    <color name="light_secondary_variant">#E2F1E7</color>
-    <color name="dark_primary">#181C14</color>
-    <color name="dark_primary_variant">#3C3D37</color>
-    <color name="dark_secondary">#697565</color>
-    <color name="dark_secondary_variant">#ECDFCC</color>
+<!--    <color name="light_primary">#243642</color>-->
+<!--    <color name="light_primary_variant">#387478</color>-->
+<!--    <color name="light_secondary">#629584</color>-->
+<!--    <color name="light_secondary_variant">#E2F1E7</color>-->
+<!--    <color name="dark_primary">#181C14</color>-->
+<!--    <color name="dark_primary_variant">#3C3D37</color>-->
+<!--    <color name="dark_secondary">#697565</color>-->
+<!--    <color name="dark_secondary_variant">#ECDFCC</color>-->
 </resources>

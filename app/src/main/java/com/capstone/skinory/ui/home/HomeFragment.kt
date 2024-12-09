@@ -18,6 +18,7 @@ import com.capstone.skinory.data.remote.retrofit.ApiNewsConfig
 import com.capstone.skinory.databinding.FragmentHomeBinding
 import com.capstone.skinory.ui.notifications.RoutineViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -78,12 +79,13 @@ class HomeFragment : Fragment() {
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     private fun fetchNews() {
         GlobalScope.launch(Dispatchers.Main) {
             try {
                 val newsResponse = ApiNewsConfig.getApiService().getNews(BuildConfig.API_NEWS_KEY)
                 // Limit to first 3 items for home fragment
-                newsAdapter.submitList(newsResponse.articles.take(3))
+                newsAdapter.submitList(newsResponse.articles.take(5))
             } catch (e: Exception) {
                 // Handle error
                 Toast.makeText(context, "Failed to load news", Toast.LENGTH_SHORT).show()

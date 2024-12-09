@@ -22,11 +22,11 @@ class BestProductAdapter : ListAdapter<BestProductsItem, BestProductAdapter.View
         fun bind(product: BestProductsItem) {
             binding.apply {
                 // Nama produk
-                textView2.text = product.category ?: "No Category"
-                textView13.text = product.nameProduct ?: "Unnamed Product"
+                tvProductName.text = product.category ?: "No Category"
+                tvName.text = product.nameProduct ?: "Unnamed Product"
 
                 // Harga - format dengan 2 desimal
-                textView14.text = try {
+                tvPrice.text = try {
                     val price = product.price?.replace(",", "")?.toFloat() ?: 0f
                     "Rp ${String.format("%,.0f", price)}"
                 } catch (e: NumberFormatException) {
@@ -34,7 +34,7 @@ class BestProductAdapter : ListAdapter<BestProductsItem, BestProductAdapter.View
                 }
 
                 // Rating - format dengan 1 desimal
-                textView15.text = try {
+                tvRating.text = try {
                     val rating = product.rating?.toFloat() ?: 0f
                     String.format("%.1f", rating)
                 } catch (e: NumberFormatException) {
@@ -45,7 +45,7 @@ class BestProductAdapter : ListAdapter<BestProductsItem, BestProductAdapter.View
                 Glide.with(itemView.context)
                     .load(product.imageUrl)
                     .placeholder(R.drawable.ic_baseline_insert_photo_24)
-                    .into(imageView3)
+                    .into(imgProduct)
 
                 // Optional: Set click listener untuk membuka store URL
                 root.setOnClickListener {

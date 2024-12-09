@@ -17,6 +17,7 @@ import com.capstone.skinory.data.UserPreferences
 import com.capstone.skinory.data.remote.response.PasswordRequest
 import com.capstone.skinory.databinding.FragmentResultBinding
 import com.capstone.skinory.databinding.FragmentSettingsBinding
+import com.capstone.skinory.ui.customview.ChangePasswordinput
 import com.capstone.skinory.ui.customview.PasswordInputLayout
 import com.capstone.skinory.ui.login.LoginActivity
 import com.capstone.skinory.ui.login.TokenDataStore
@@ -48,57 +49,62 @@ class SettingsFragment : Fragment() {
 
         // Reset Password Click
         binding.linearLayout1.setOnClickListener {
-            val passwordInputLayout = PasswordInputLayout(requireContext())
-            val passwordEditText = passwordInputLayout.editText
+            val changePasswordinput = ChangePasswordinput(requireContext())
 
-            // Tampilkan dialog untuk input password
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Ubah Password")
-                .setView(passwordInputLayout)
+                .setView(changePasswordinput)
                 .setPositiveButton("Simpan") { _, _ ->
-                    val newPassword = passwordEditText?.text.toString()
+                    if (changePasswordinput.isPasswordValid()) {
+                        val newPassword = changePasswordinput.getPassword()
+                        // Validasi password
+                        if (!changePasswordinput.isErrorEnabled) {
+                            lifecycleScope.launch {
+                                try {
+                                    // Ambil token dari TokenDataStore
+                                    val token = TokenDataStore.getInstance(requireContext())
+                                        .token.first() ?: throw Exception("Token not found")
 
-                    // Validasi password
-                    if (!passwordInputLayout.isErrorEnabled) {
-                        lifecycleScope.launch {
-                            try {
-                                // Ambil token dari TokenDataStore
-                                val token = TokenDataStore.getInstance(requireContext())
-                                    .token.first() ?: throw Exception("Token not found")
+                                    // Kirim password baru ke repository
+                                    val result = settingsViewModel.updatePassword(
+                                        token,
+                                        PasswordRequest(newPassword)
+                                    )
 
-                                // Kirim password baru ke repository
-                                val result = settingsViewModel.updatePassword(
-                                    token,
-                                    PasswordRequest(newPassword)
-                                )
-
-                                // Tampilkan pesan berhasil
-                                result.onSuccess { response ->
+                                    // Tampilkan pesan berhasil
+                                    result.onSuccess { response ->
+                                        Toast.makeText(
+                                            requireContext(),
+                                            response.message ?: "Password berhasil diubah",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }.onFailure { error ->
+                                        Toast.makeText(
+                                            requireContext(),
+                                            error.message ?: "Gagal mengubah password",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                } catch (e: Exception) {
                                     Toast.makeText(
                                         requireContext(),
-                                        response.message ?: "Password berhasil diubah",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }.onFailure { error ->
-                                    Toast.makeText(
-                                        requireContext(),
-                                        error.message ?: "Gagal mengubah password",
+                                        e.message ?: "Terjadi kesalahan",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
-                            } catch (e: Exception) {
-                                Toast.makeText(
-                                    requireContext(),
-                                    e.message ?: "Terjadi kesalahan",
-                                    Toast.LENGTH_SHORT
-                                ).show()
                             }
                         }
+                    } else {
+                        // Tampilkan pesan kesalahan jika password tidak valid
+                        Toast.makeText(requireContext(), "Password tidak valid", Toast.LENGTH_SHORT).show()
                     }
                 }
                 .setNegativeButton("Batal", null)
                 .show()
         }
+
+        val isDarkModeEnabled = settingsViewModel.isDarkModeEnabled()
+        binding.switchDarkMode.isChecked = isDarkModeEnabled
 
         // Dark Mode Switch
         binding.switchDarkMode.setOnCheckedChangeListener { _, isChecked ->

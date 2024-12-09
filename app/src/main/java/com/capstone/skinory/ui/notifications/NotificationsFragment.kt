@@ -67,7 +67,7 @@ class NotificationsFragment : Fragment() {
             } else {
                 // Nonaktifkan notifikasi jika izin tidak terpenuhi
                 userPreferences.setNotificationsEnabled(false)
-                binding.switch1.isChecked = false
+                binding.switchNotification.isChecked = false
             }
         }
 
@@ -98,7 +98,7 @@ class NotificationsFragment : Fragment() {
 
                     // Pastikan alarm permission juga diizinkan
                     if (hasExactAlarmPermission()) {
-                        binding.switch1.isChecked = true
+                        binding.switchNotification.isChecked = true
                         notificationHelper.scheduleNotifications()
                         userPreferences.setNotificationsEnabled(true)
                     } else {
@@ -107,7 +107,7 @@ class NotificationsFragment : Fragment() {
                 } else {
                     // Izin ditolak
                     Log.d("NotificationsFragment", "Notification permission denied")
-                    binding.switch1.isChecked = false
+                    binding.switchNotification.isChecked = false
 
                     // Tampilkan dialog penjelasan
                     showPermissionRationaleDialog()
@@ -170,7 +170,7 @@ class NotificationsFragment : Fragment() {
     }
 
     private fun setupNotificationSwitch() {
-        binding.switch1.setOnCheckedChangeListener { _, isChecked ->
+        binding.switchNotification.setOnCheckedChangeListener { _, isChecked ->
             when {
                 isChecked -> {
                     if (!userPreferences.isAutoStartPermissionRequested()) {
@@ -179,7 +179,7 @@ class NotificationsFragment : Fragment() {
                     // Periksa izin alarm
                     if (!hasExactAlarmPermission()) {
                         checkAndRequestAlarmPermission()
-                        binding.switch1.isChecked = false
+                        binding.switchNotification.isChecked = false
                         return@setOnCheckedChangeListener
                     }
 
@@ -191,7 +191,7 @@ class NotificationsFragment : Fragment() {
                             ) != PackageManager.PERMISSION_GRANTED
                         ) {
                             requestNotificationPermission()
-                            binding.switch1.isChecked = false
+                            binding.switchNotification.isChecked = false
                             return@setOnCheckedChangeListener
                         }
                     }
@@ -216,7 +216,7 @@ class NotificationsFragment : Fragment() {
         }
 
         // Set initial switch state from user preferences
-        binding.switch1.isChecked = userPreferences.areNotificationsEnabled()
+        binding.switchNotification.isChecked = userPreferences.areNotificationsEnabled()
     }
 
     private fun checkBatteryOptimization() {

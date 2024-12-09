@@ -36,13 +36,13 @@ class ProductAdapter(
 
         fun bind(product: ProductsItem) {
             // Set nama produk
-            binding.textView2.text = product.nameProduct
+            binding.tvProductName.text = product.nameProduct
 
             // Memuat gambar dengan Glide
             Glide.with(binding.root.context)
                 .load(product.imageUrl)
                 .placeholder(R.drawable.ic_baseline_insert_photo_24)
-                .into(binding.imageView3)
+                .into(binding.imgProduct)
         }
     }
 

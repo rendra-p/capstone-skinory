@@ -33,17 +33,17 @@ class NotifNightActivity : AppCompatActivity() {
         }
 
         // Moisturizer
-        binding.button3.setOnClickListener {
+        binding.btnMoisturizer.setOnClickListener {
             navigateToSelectProduct("moisturizer")
         }
 
         // Toner
-        binding.button4.setOnClickListener {
+        binding.btnToner.setOnClickListener {
             navigateToSelectProduct("toner")
         }
 
         // Save button
-        binding.button6.setOnClickListener {
+        binding.btnDone.setOnClickListener {
             navigateToMainActivity()
         }
     }
@@ -78,11 +78,11 @@ class NotifNightActivity : AppCompatActivity() {
                     viewModel.setSelectedProduct("facewash", productId)
                 }
                 "moisturizer" -> {
-                    binding.button3.text = productName
+                    binding.btnMoisturizer.text = productName
                     viewModel.setSelectedProduct("moisturizer", productId)
                 }
                 "toner" -> {
-                    binding.button4.text = productName
+                    binding.btnToner.text = productName
                     viewModel.setSelectedProduct("toner", productId)
                 }
             }

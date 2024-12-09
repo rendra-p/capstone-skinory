@@ -146,7 +146,10 @@
             android:id="@+id/to_register"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingVertical="10dp"
+            android:paddingHorizontal="5dp"
             android:text="@string/register"
+            android:textStyle="italic"
             android:textColor="@color/blue_click" />
     </LinearLayout>
 
@@ -165,7 +168,7 @@
         android:layout_height="64dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintGuide_percent="0.1"
+        app:layout_constraintGuide_begin="73dp"
         app:layout_constraintStart_toStartOf="parent" />
 
     <ProgressBar

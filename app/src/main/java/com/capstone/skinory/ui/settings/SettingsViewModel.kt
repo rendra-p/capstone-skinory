@@ -28,4 +28,8 @@ class SettingsViewModel(
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         }
     }
+
+    fun isDarkModeEnabled(): Boolean {
+        return userPreferences.isDarkModeEnabled()
+    }
 }
