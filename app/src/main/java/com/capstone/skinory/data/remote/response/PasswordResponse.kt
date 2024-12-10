@@ -12,5 +12,5 @@ data class PasswordResponse(
 )
 
 data class PasswordRequest(
-	val password: String
+	val newPassword: String
 )

@@ -11,21 +11,37 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.view.View
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.lifecycleScope
+import com.capstone.skinory.data.UserPreferences
+import com.capstone.skinory.data.remote.retrofit.ApiModelConfig
 import com.capstone.skinory.ui.MainActivity
 import com.capstone.skinory.databinding.ActivityAnalysisBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.IOException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import java.text.SimpleDateFormat
 import java.util.Date
 
 class AnalysisActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAnalysisBinding
+    private lateinit var userPreference: UserPreferences
+    private lateinit var progressBar: ProgressBar
     private val CAMERA_REQUEST_CODE = 100
     private val GALLERY_REQUEST_CODE = 200
     private lateinit var photoURI: Uri
@@ -36,6 +52,9 @@ class AnalysisActivity : AppCompatActivity() {
         binding = ActivityAnalysisBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        userPreference = UserPreferences(this)
+        progressBar = binding.progressBar
+
         binding.btnCamera.setOnClickListener {
             openCamera()
         }
@@ -45,7 +64,11 @@ class AnalysisActivity : AppCompatActivity() {
         }
 
         binding.btnAnalysis.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
+            if (imageUri != null) {
+                uploadImageAndAnalyze()
+            } else {
+                Toast.makeText(this, "Please select an image first", Toast.LENGTH_SHORT).show()
+            }
         }
 
         if (savedInstanceState != null) {
@@ -155,6 +178,79 @@ class AnalysisActivity : AppCompatActivity() {
             }
         }
         return inSampleSize
+    }
+
+    private fun uploadImageAndAnalyze() {
+        val userId = userPreference.getUserId()
+        if (userId.isNullOrEmpty()) {
+            Toast.makeText(this, "User ID not found", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        progressBar.visibility = View.VISIBLE
+        binding.btnAnalysis.isEnabled = false
+
+        val file = imageUri?.let { uri ->
+            File(getRealPathFromURI(uri) ?: return@let null)
+        }
+
+        if (file == null) {
+            Toast.makeText(this, "Failed to process image", Toast.LENGTH_SHORT).show()
+            progressBar.visibility = View.GONE
+            binding.btnAnalysis.isEnabled = true
+            return
+        }
+
+        val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+        val body = MultipartBody.Part.createFormData("image", file.name, requestFile)
+
+        lifecycleScope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    val response = ApiModelConfig.getApiService().uploadImage(
+                        userId = userId,
+                        image = body
+                    )
+
+                    // Proses response
+                    withContext(Dispatchers.Main) {
+                        progressBar.visibility = View.GONE
+                        binding.btnAnalysis.isEnabled = true
+
+                        // Navigasi atau proses lebih lanjut
+                        val intent = Intent(this@AnalysisActivity, MainActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    progressBar.visibility = View.GONE
+                    binding.btnAnalysis.isEnabled = true
+
+                    // Pesan error yang lebih informatif
+                    val errorMessage = when (e) {
+                        is SocketTimeoutException -> "Connection timed out. Please check your internet connection."
+                        is UnknownHostException -> "No internet connection."
+                        is IOException -> "Network error occurred: ${e.message}"
+                        else -> "Upload failed: ${e.message}"
+                    }
+
+                    Toast.makeText(this@AnalysisActivity, errorMessage, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    // Metode untuk mendapatkan path sebenarnya dari URI
+    private fun getRealPathFromURI(uri: Uri): String? {
+        val projection = arrayOf(MediaStore.Images.Media.DATA)
+        val cursor = contentResolver.query(uri, projection, null, null, null)
+        return cursor?.use {
+            val columnIndex = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+            it.moveToFirst()
+            it.getString(columnIndex)
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

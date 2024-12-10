@@ -450,11 +450,6 @@ class NotificationsFragment : Fragment() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
     companion object {
         private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 1001
     }

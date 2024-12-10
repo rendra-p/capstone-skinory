@@ -14,7 +14,10 @@ import com.capstone.skinory.data.remote.retrofit.ApiService
 import com.capstone.skinory.ui.MainActivity
 import com.capstone.skinory.databinding.ActivitySplashBinding
 import com.capstone.skinory.ui.analysis.AnalysisActivity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 
 @Suppress("DEPRECATION")
@@ -40,35 +43,45 @@ class Splash : AppCompatActivity() {
     }
 
     private fun checkToken() {
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
                 if (!isInternetAvailable()) {
-                    navigateToErrorActivity("no_internet")
+                    withContext(Dispatchers.Main) {
+                        navigateToErrorActivity("no_internet")
+                    }
                     return@launch
                 }
 
-                tokenDataStore.token.collect { token ->
+                tokenDataStore.token.first { token ->
                     if (!token.isNullOrEmpty()) {
                         val userId = userPreferences.getUserId()
 
                         if (userId != null) {
                             val result = validateToken(userId, token)
 
-                            if (result) {
-                                navigateToAnalysisActivity()
-                            } else {
-//                                navigateToLoginActivity()
-                                navigateToAnalysisActivity()
+                            withContext(Dispatchers.Main) {
+                                if (result) {
+                                    navigateToAnalysisActivity()
+                                } else {
+                                    navigateToLoginActivity()
+                                }
                             }
                         } else {
-                            navigateToLoginActivity()
+                            withContext(Dispatchers.Main) {
+                                navigateToLoginActivity()
+                            }
                         }
                     } else {
-                        navigateToLoginActivity()
+                        withContext(Dispatchers.Main) {
+                            navigateToLoginActivity()
+                        }
                     }
+                    true
                 }
             } catch (e: Exception) {
-                navigateToErrorActivity("unknown", e.message)
+                withContext(Dispatchers.Main) {
+                    navigateToErrorActivity("unknown", e.message)
+                }
             }
         }
     }
