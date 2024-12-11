@@ -14,10 +14,9 @@ class ChangePasswordInput @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : TextInputLayout(context, attrs, defStyleAttr) {
 
-    private val editText: TextInputEditText
+    private val editText: TextInputEditText = TextInputEditText(context)
 
     init {
-        editText = TextInputEditText(context)
 
         val layoutParams = LayoutParams(
             LayoutParams.MATCH_PARENT,

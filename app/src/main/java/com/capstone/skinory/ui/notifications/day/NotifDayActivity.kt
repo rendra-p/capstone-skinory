@@ -2,7 +2,6 @@ package com.capstone.skinory.ui.notifications.day
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.capstone.skinory.ui.MainActivity

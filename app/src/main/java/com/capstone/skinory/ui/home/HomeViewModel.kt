@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capstone.skinory.data.DataRepository
-import com.capstone.skinory.data.remote.response.ProfileResponse
 import com.capstone.skinory.ui.login.TokenDataStore
 import kotlinx.coroutines.launch
 

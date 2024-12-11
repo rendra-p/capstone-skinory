@@ -50,4 +50,6 @@
     <string name="reset_password">Reset Password</string>
     <string name="dark_mode">Dark Mode</string>
     <string name="try_again">Try Again</string>
+    <string name="info_analysis">Select an image from the gallery or camera</string>
+    <string name="info_result">note: clickable items</string>
 </resources>

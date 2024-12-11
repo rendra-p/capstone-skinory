@@ -13,7 +13,6 @@ import com.capstone.skinory.data.remote.retrofit.ApiConfig
 import com.capstone.skinory.data.remote.retrofit.ApiService
 import com.capstone.skinory.ui.MainActivity
 import com.capstone.skinory.databinding.ActivitySplashBinding
-import com.capstone.skinory.ui.analysis.AnalysisActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch

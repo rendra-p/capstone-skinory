@@ -3,7 +3,6 @@ package com.capstone.skinory.ui.home
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.capstone.skinory.BuildConfig
