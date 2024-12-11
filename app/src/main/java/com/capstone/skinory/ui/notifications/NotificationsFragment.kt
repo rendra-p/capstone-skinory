@@ -262,7 +262,7 @@ class NotificationsFragment : Fragment() {
                     .map { (applied, routines) ->
                         GroupedRoutinesItem(
                             applied = applied ?: "Unknown",
-                            products = routines.flatMap { it.nameProduct?.split(",")?.map { product -> product.trim() } ?: emptyList() }
+                            products = routines.mapNotNull { it.nameProduct?.trim() }
                         )
                     }
 

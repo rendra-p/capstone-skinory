@@ -38,9 +38,19 @@ class NotificationAdapter(
         ) {
             binding.tvUsage.text = routine.applied
 
-            binding.tvNotificationProduct.text = routine.products.mapIndexed { index, product ->
-                "${index + 1}. $product"
+            fun formatProductDisplay(productName: String, maxLength: Int = 50): String {
+                return if (productName.length > maxLength) {
+                    productName.substring(0, maxLength) + "..."
+                } else {
+                    productName
+                }
+            }
+
+            val displayProducts = routine.products.mapIndexed { index, product ->
+                "${index + 1}. ${formatProductDisplay(product)}"
             }.joinToString("\n")
+
+            binding.tvNotificationProduct.text = displayProducts
 
             binding.imgbtnDelete.setOnClickListener {
                 onDeleteClick()

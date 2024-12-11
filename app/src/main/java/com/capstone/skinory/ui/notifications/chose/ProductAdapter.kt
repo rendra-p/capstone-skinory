@@ -33,7 +33,15 @@ class ProductAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(product: ProductsItem) {
-            binding.tvProductName.text = product.nameProduct
+            fun formatProductDisplay(productName: String, maxLength: Int = 100): String {
+                return if (productName.length > maxLength) {
+                    productName.substring(0, maxLength) + "..."
+                } else {
+                    productName
+                }
+            }
+
+            binding.tvProductName.text = formatProductDisplay(product.nameProduct ?: "")
 
             Glide.with(binding.root.context)
                 .load(product.imageUrl)
