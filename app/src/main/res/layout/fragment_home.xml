@@ -2,13 +2,14 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_home_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment"
     android:background="?attr/colorSecondaryVariant">
 
     <ImageView
-        android:id="@+id/imageView4"
+        android:id="@+id/iv_profile"
         android:layout_width="72dp"
         android:layout_height="72dp"
         android:layout_marginStart="20dp"
@@ -19,27 +20,27 @@
         tools:ignore="ContentDescription" />
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/tv_hello_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:text="@string/hello_username"
         android:textSize="24sp"
-        app:layout_constraintStart_toEndOf="@+id/imageView4"
-        app:layout_constraintTop_toTopOf="@+id/imageView4" />
+        app:layout_constraintStart_toEndOf="@+id/iv_profile"
+        app:layout_constraintTop_toTopOf="@+id/iv_profile" />
 
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/tv_greet"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:text="@string/greed_main"
         android:textSize="18sp"
-        app:layout_constraintStart_toStartOf="@+id/textView5"
-        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+        app:layout_constraintStart_toStartOf="@+id/tv_hello_name"
+        app:layout_constraintTop_toBottomOf="@+id/tv_hello_name" />
 
     <View
-        android:id="@+id/view"
+        android:id="@+id/view_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="30dp"
@@ -47,10 +48,10 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView6" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_greet" />
 
     <TextView
-        android:id="@+id/textView7"
+        android:id="@+id/tv_skin_type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
@@ -60,10 +61,10 @@
         android:fontFamily="@font/nunito_semibold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/view" />
+        app:layout_constraintTop_toTopOf="@+id/view_container" />
 
     <TextView
-        android:id="@+id/textView8"
+        android:id="@+id/tv_info_skin_type"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -74,7 +75,7 @@
         android:fontFamily="@font/nunito_light"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView7" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_skin_type" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -85,10 +86,10 @@
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView8">
+        app:layout_constraintTop_toBottomOf="@+id/tv_info_skin_type">
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/btn_myresult"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_weight="1"
@@ -96,7 +97,7 @@
             android:text="@string/btn_result" />
 
         <TextView
-            android:id="@+id/textView10"
+            android:id="@+id/tv_or_main"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -105,7 +106,7 @@
             android:textStyle="italic"/>
 
         <Button
-            android:id="@+id/button7"
+            android:id="@+id/btn_mypicture"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_weight="1"
@@ -114,7 +115,7 @@
     </LinearLayout>
 
     <View
-        android:id="@+id/view2"
+        android:id="@+id/view_line"
         android:layout_width="match_parent"
         android:layout_height="3dp"
         android:layout_marginTop="20dp"
@@ -127,12 +128,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="@+id/view"
-        app:layout_constraintStart_toStartOf="@+id/view"
-        app:layout_constraintTop_toBottomOf="@+id/view2">
+        app:layout_constraintEnd_toEndOf="@+id/view_container"
+        app:layout_constraintStart_toStartOf="@+id/view_container"
+        app:layout_constraintTop_toBottomOf="@+id/view_line">
 
         <TextView
-            android:id="@+id/textView11"
+            android:id="@+id/tv_title_article"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -145,7 +146,7 @@
             android:layout_weight="1" />
 
         <TextView
-            android:id="@+id/textView12"
+            android:id="@+id/tv_btn_seemore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -164,4 +165,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout5" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

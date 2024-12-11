@@ -2,6 +2,7 @@ package com.capstone.skinory.ui.notifications.day
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.capstone.skinory.ui.MainActivity
@@ -17,6 +18,7 @@ class NotifDayActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityNotifDayBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val viewModelFactory = Injection.provideViewModelFactory(this)
         viewModel = ViewModelProvider(this, viewModelFactory)[NotifDayViewModel::class.java]
@@ -93,6 +95,11 @@ class NotifDayActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 
     companion object {

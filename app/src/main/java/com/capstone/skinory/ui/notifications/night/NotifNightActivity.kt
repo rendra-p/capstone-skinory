@@ -2,6 +2,7 @@ package com.capstone.skinory.ui.notifications.night
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.capstone.skinory.ui.MainActivity
@@ -17,6 +18,7 @@ class NotifNightActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityNotifNightBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val viewModelFactory = Injection.provideViewModelFactory(this)
         viewModel = ViewModelProvider(this, viewModelFactory)[NotifNightViewModel::class.java]
@@ -84,6 +86,11 @@ class NotifNightActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 
     companion object {

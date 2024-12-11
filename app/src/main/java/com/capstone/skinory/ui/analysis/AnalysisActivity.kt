@@ -51,6 +51,7 @@ class AnalysisActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityAnalysisBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        supportActionBar?.hide()
 
         userPreference = UserPreferences(this)
         progressBar = binding.progressBar

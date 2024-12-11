@@ -14,6 +14,9 @@ class RoutineViewModel(
     private val repository: DataRepository,
     private val tokenDataStore: TokenDataStore
 ) : ViewModel() {
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
+
     private val _dayRoutines = MutableLiveData<List<RoutinesItem>>()
     val dayRoutines: LiveData<List<RoutinesItem>> = _dayRoutines
 
@@ -22,6 +25,7 @@ class RoutineViewModel(
 
     fun fetchRoutines() {
         viewModelScope.launch {
+            _isLoading.value = true
             tokenDataStore.token.collect { token ->
                 token?.let {
                     try {
@@ -40,6 +44,8 @@ class RoutineViewModel(
                         }
                     } catch (e: Exception) {
                         Log.e("RoutineViewModel", "Fetch routine error", e)
+                    } finally {
+                        _isLoading.value = false
                     }
                 }
             }
@@ -48,6 +54,7 @@ class RoutineViewModel(
 
     fun deleteRoutine(isDay: Boolean) {
         viewModelScope.launch {
+            _isLoading.value = true
             tokenDataStore.token.collect { token ->
                 token?.let {
                     try {
@@ -63,6 +70,8 @@ class RoutineViewModel(
                         }
                     } catch (e: Exception) {
                         Log.e("RoutineViewModel", "Delete routine error", e)
+                    } finally {
+                        _isLoading.value = false
                     }
                 }
             }

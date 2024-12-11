@@ -19,6 +19,7 @@ class ChoseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityChoseBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        supportActionBar?.hide()
 
         val viewModelFactory = Injection.provideViewModelFactory(this)
         routineViewModel = ViewModelProvider(this, viewModelFactory)[RoutineViewModel::class.java]

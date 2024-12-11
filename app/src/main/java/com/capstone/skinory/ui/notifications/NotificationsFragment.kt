@@ -66,6 +66,7 @@ class NotificationsFragment : Fragment() {
         checkAndRequestAlarmPermission()
         hasExactAlarmPermission()
         setupNotificationSwitch()
+        setupLoading()
         setupRecyclerView()
         observeRoutines()
         setupFloatingActionButton()
@@ -254,6 +255,13 @@ class NotificationsFragment : Fragment() {
         binding.recyclerView.adapter = notificationAdapter
     }
 
+    private fun setupLoading() {
+        routineViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+            binding.recyclerView.visibility = if (isLoading) View.GONE else View.VISIBLE
+        }
+    }
+
     private fun observeRoutines() {
         routineViewModel.dayRoutines.observe(viewLifecycleOwner) { dayRoutines ->
             routineViewModel.nightRoutines.observe(viewLifecycleOwner) { nightRoutines ->
@@ -267,7 +275,6 @@ class NotificationsFragment : Fragment() {
                     }
 
                 notificationAdapter.submitList(combinedRoutines)
-
                 updateFloatingActionButtonState(combinedRoutines.size)
             }
         }
