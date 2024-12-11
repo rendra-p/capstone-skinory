@@ -60,7 +60,16 @@ class SelectProductActivity : AppCompatActivity() {
         if (routineType == "day") {
             viewModel.saveRoutineDayResult.observe(this) { result ->
                 result.onSuccess {
-                    Toast.makeText(this, "Routine day saved successfully", Toast.LENGTH_SHORT).show()
+                    val selectedProduct = intent.getStringExtra("CATEGORY")?.let { category ->
+                        viewModel.getSelectedProduct(category)
+                    }
+
+                    val resultIntent = Intent().apply {
+                        putExtra("PRODUCT_NAME", selectedProduct?.nameProduct ?: "Selected")
+                        putExtra("CATEGORY", intent.getStringExtra("CATEGORY"))
+                        putExtra("PRODUCT_ID", selectedProduct?.idProduct)
+                    }
+                    setResult(RESULT_OK, resultIntent)
                     finish()
                 }.onFailure { exception ->
                     Toast.makeText(this, "Failed to save routine day: ${exception.message}", Toast.LENGTH_SHORT).show()
@@ -69,7 +78,16 @@ class SelectProductActivity : AppCompatActivity() {
         } else {
             viewModel.saveRoutineNightResult.observe(this) { result ->
                 result.onSuccess {
-                    Toast.makeText(this, "Routine night saved successfully", Toast.LENGTH_SHORT).show()
+                    val selectedProduct = intent.getStringExtra("CATEGORY")?.let { category ->
+                        viewModel.getSelectedProduct(category)
+                    }
+
+                    val resultIntent = Intent().apply {
+                        putExtra("PRODUCT_NAME", selectedProduct?.nameProduct ?: "Selected")
+                        putExtra("CATEGORY", intent.getStringExtra("CATEGORY"))
+                        putExtra("PRODUCT_ID", selectedProduct?.idProduct)
+                    }
+                    setResult(RESULT_OK, resultIntent)
                     finish()
                 }.onFailure { exception ->
                     Toast.makeText(this, "Failed to save routine night: ${exception.message}", Toast.LENGTH_SHORT).show()
@@ -119,14 +137,6 @@ class SelectProductActivity : AppCompatActivity() {
                                     it
                                 )
                             }
-
-                            val resultIntent = Intent().apply {
-                                putExtra("PRODUCT_NAME", "Selected")
-                                putExtra("CATEGORY", product.category)
-                                putExtra("PRODUCT_ID", product.idProduct)
-                            }
-                            setResult(RESULT_OK, resultIntent)
-                            finish()
                         } else {
                             Toast.makeText(this@SelectProductActivity, "Product category or ID is null", Toast.LENGTH_SHORT).show()
                         }

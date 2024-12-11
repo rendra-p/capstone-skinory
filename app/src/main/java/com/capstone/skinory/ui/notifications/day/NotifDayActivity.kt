@@ -73,18 +73,22 @@ class NotifDayActivity : AppCompatActivity() {
             when (category) {
                 "facewash" -> {
                     binding.btnFacewash.text = productName
+                    binding.btnFacewash.isEnabled = false
                     viewModel.setSelectedProduct("facewash", productId)
                 }
                 "sunscreen" -> {
                     binding.btnSunscreen.text = productName
+                    binding.btnSunscreen.isEnabled = false
                     viewModel.setSelectedProduct("sunscreen", productId)
                 }
                 "moisturizer" -> {
                     binding.btnMoisturizer.text = productName
+                    binding.btnMoisturizer.isEnabled = false
                     viewModel.setSelectedProduct("moisturizer", productId)
                 }
                 "toner" -> {
                     binding.btnToner.text = productName
+                    binding.btnToner.isEnabled = false
                     viewModel.setSelectedProduct("toner", productId)
                 }
             }

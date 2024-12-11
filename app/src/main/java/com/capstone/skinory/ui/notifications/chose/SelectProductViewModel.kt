@@ -13,6 +13,8 @@ class SelectProductViewModel(private val repository: DataRepository) : ViewModel
     private val _productsResult = MutableLiveData<Result<List<ProductsItem>>>()
     val productsResult: LiveData<Result<List<ProductsItem>>> = _productsResult
 
+    private var selectedProduct: ProductsItem? = null
+
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
@@ -39,24 +41,40 @@ class SelectProductViewModel(private val repository: DataRepository) : ViewModel
     }
 
     fun saveRoutineDay(category: String, productId: Int, selectedProducts: Map<String, Int>, token: String) {
+        _isLoading.value = true
         viewModelScope.launch {
             try {
                 val result = repository.saveRoutineDay(category, productId, selectedProducts, token)
                 _saveRoutineDayResult.value = result
+                selectedProduct = _productsResult.value?.getOrNull()
+                    ?.find { it.idProduct == productId && it.category == category }
             } catch (e: Exception) {
                 _saveRoutineDayResult.value = Result.failure(e)
+                Log.e("SaveRoutineDay", "Error saving routine day", e)
+            } finally {
+                _isLoading.value = false
             }
         }
     }
 
     fun saveRoutineNight(category: String, productId: Int, selectedProducts: Map<String, Int>, token: String) {
+        _isLoading.value = true
         viewModelScope.launch {
             try {
                 val result = repository.saveRoutineNight(category, productId, selectedProducts, token)
                 _saveRoutineNightResult.value = result
+                selectedProduct = _productsResult.value?.getOrNull()
+                    ?.find { it.idProduct == productId && it.category == category }
             } catch (e: Exception) {
                 _saveRoutineNightResult.value = Result.failure(e)
+                Log.e("SaveRoutineNight", "Error saving routine night", e)
+            } finally {
+                _isLoading.value = false
             }
         }
+    }
+
+    fun getSelectedProduct(category: String): ProductsItem? {
+        return selectedProduct
     }
 }
