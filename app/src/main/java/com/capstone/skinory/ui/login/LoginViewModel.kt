@@ -8,12 +8,16 @@ import com.capstone.skinory.data.DataRepository
 import com.capstone.skinory.data.UserPreferences
 import com.capstone.skinory.data.remote.response.LoginRequest
 import com.capstone.skinory.data.remote.response.LoginResponse
+import com.capstone.skinory.data.remote.response.ProfileResponse
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
 class LoginViewModel(private val repository: DataRepository, private val tokenDataStore: TokenDataStore, private val userPreferences: UserPreferences) : ViewModel() {
     private val _loginResult = MutableLiveData<Result<LoginResponse>>()
     val loginResult: LiveData<Result<LoginResponse>> = _loginResult
+
+    private val _profileResult = MutableLiveData<Result<ProfileResponse>>()
+    val profileResult: LiveData<Result<ProfileResponse>> = _profileResult
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
@@ -29,6 +33,7 @@ class LoginViewModel(private val repository: DataRepository, private val tokenDa
                 result.onSuccess { response ->
                     response.loginResult?.token?.let { token ->
                         tokenDataStore.saveToken(token)
+                        checkProfile(token)
                     }
                     response.loginResult?.userId?.let { userId ->
                         userPreferences.saveUserId(userId)
@@ -46,5 +51,10 @@ class LoginViewModel(private val repository: DataRepository, private val tokenDa
                 _isLoading.value = false
             }
         }
+    }
+
+    private suspend fun checkProfile(token: String) {
+        val profileResult = repository.getProfile(token)
+        _profileResult.value = profileResult
     }
 }

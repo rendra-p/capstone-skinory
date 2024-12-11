@@ -14,6 +14,7 @@ import com.capstone.skinory.R
 import com.capstone.skinory.data.Injection
 import com.capstone.skinory.data.UserPreferences
 import com.capstone.skinory.databinding.ActivityLoginBinding
+import com.capstone.skinory.ui.MainActivity
 import com.capstone.skinory.ui.analysis.AnalysisActivity
 import com.capstone.skinory.ui.register.RegisterActivity
 
@@ -39,6 +40,7 @@ class LoginActivity : AppCompatActivity() {
         setupView()
         setupAction()
         observeLoginResult()
+        observeProfileResult()
     }
 
     private fun setupView() {
@@ -98,12 +100,28 @@ class LoginActivity : AppCompatActivity() {
 
     private fun observeLoginResult() {
         viewModel.loginResult.observe(this) { result ->
-            result.onSuccess { response ->
-                Toast.makeText(this, "Login successful: ${response.message}", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this, AnalysisActivity::class.java))
-                finish()
+            result.onSuccess {
+                Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
             }.onFailure { exception ->
                 Toast.makeText(this, "Login failed: ${exception.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun observeProfileResult() {
+        viewModel.profileResult.observe(this) { result ->
+            result.onSuccess { profileResponse ->
+                val intent = if (profileResponse.profile?.skinType.isNullOrEmpty()) {
+                    Intent(this, AnalysisActivity::class.java)
+                } else {
+                    Intent(this, MainActivity::class.java)
+                }
+                startActivity(intent)
+                finish()
+            }.onFailure { exception ->
+                Toast.makeText(this, "Failed to fetch profile: ${exception.message}", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this, AnalysisActivity::class.java))
+                finish()
             }
         }
     }

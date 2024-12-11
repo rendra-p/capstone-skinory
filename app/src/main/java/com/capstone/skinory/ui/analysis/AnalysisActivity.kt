@@ -207,17 +207,15 @@ class AnalysisActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                    val response = ApiModelConfig.getApiService().uploadImage(
+                    ApiModelConfig.getApiService().uploadImage(
                         userId = userId,
                         image = body
                     )
 
-                    // Proses response
                     withContext(Dispatchers.Main) {
                         progressBar.visibility = View.GONE
                         binding.btnAnalysis.isEnabled = true
 
-                        // Navigasi atau proses lebih lanjut
                         val intent = Intent(this@AnalysisActivity, MainActivity::class.java)
                         startActivity(intent)
                         finish()
@@ -228,7 +226,6 @@ class AnalysisActivity : AppCompatActivity() {
                     progressBar.visibility = View.GONE
                     binding.btnAnalysis.isEnabled = true
 
-                    // Pesan error yang lebih informatif
                     val errorMessage = when (e) {
                         is SocketTimeoutException -> "Connection timed out. Please check your internet connection."
                         is UnknownHostException -> "No internet connection."
@@ -242,7 +239,6 @@ class AnalysisActivity : AppCompatActivity() {
         }
     }
 
-    // Metode untuk mendapatkan path sebenarnya dari URI
     private fun getRealPathFromURI(uri: Uri): String? {
         val projection = arrayOf(MediaStore.Images.Media.DATA)
         val cursor = contentResolver.query(uri, projection, null, null, null)
