@@ -94,6 +94,7 @@ class AnalysisActivity : AppCompatActivity() {
                         "${packageName}.fileprovider",
                         it
                     )
+                    imageUri = photoURI
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
                     startActivityForResult(takePictureIntent, CAMERA_REQUEST_CODE)
                 }
@@ -122,7 +123,8 @@ class AnalysisActivity : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 CAMERA_REQUEST_CODE -> {
-                    compressAndSetImage(photoURI)
+                    imageUri = photoURI
+                    compressAndSetImage(imageUri!!)
                 }
                 GALLERY_REQUEST_CODE -> {
                     imageUri = data?.data
