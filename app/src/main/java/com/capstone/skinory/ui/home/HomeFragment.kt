@@ -40,44 +40,15 @@ class HomeFragment : Fragment() {
         val viewModelFactory = Injection.provideViewModelFactory(requireContext())
         homeViewModel = ViewModelProvider(this, viewModelFactory)[HomeViewModel::class.java]
 
-        _binding!!.progressBar.visibility = View.VISIBLE
-        _binding!!.fragmentHomeContainer.visibility = View.GONE
+        homeViewModel.fetchTokenAndProfile()
 
-        fetchDataSequentially()
         setText()
         setupButton()
         setupRecyclerView()
+        setupLoadingNews()
+        fetchNews()
 
         return binding.root
-    }
-
-    private fun fetchDataSequentially() {
-        homeViewModel.fetchTokenAndProfile()
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                binding.progressBar.visibility = View.VISIBLE
-                binding.fragmentHomeContainer.visibility = View.GONE
-
-                val newsResponse = withContext(Dispatchers.IO) {
-                    ApiNewsConfig.getApiService().getNews(BuildConfig.API_NEWS_KEY)
-                }
-
-                withContext(Dispatchers.Main) {
-                    newsAdapter.submitList(newsResponse.articles.take(5))
-
-                    binding.progressBar.visibility = View.GONE
-                    binding.fragmentHomeContainer.visibility = View.VISIBLE
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(context, "Failed to load news", Toast.LENGTH_SHORT).show()
-
-                    binding.progressBar.visibility = View.GONE
-                    binding.fragmentHomeContainer.visibility = View.VISIBLE
-                }
-            }
-        }
     }
 
     private fun setText() {
@@ -119,6 +90,27 @@ class HomeFragment : Fragment() {
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = newsAdapter
+        }
+    }
+
+    private fun setupLoadingNews() {
+        binding.progressBarNews.visibility = View.VISIBLE
+        binding.recyclerView.visibility = View.GONE
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun fetchNews() {
+        GlobalScope.launch(Dispatchers.Main) {
+            try {
+                val newsResponse = ApiNewsConfig.getApiService().getNews(BuildConfig.API_NEWS_KEY)
+                newsAdapter.submitList(newsResponse.articles.take(5))
+
+                binding.progressBarNews.visibility = View.GONE
+                binding.recyclerView.visibility = View.VISIBLE
+            } catch (e: Exception) {
+                binding.progressBarNews.visibility = View.GONE
+                Toast.makeText(context, "Failed to load news", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }
