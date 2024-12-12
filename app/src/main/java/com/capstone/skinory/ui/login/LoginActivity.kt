@@ -90,8 +90,8 @@ class LoginActivity : AppCompatActivity() {
             isValid = false
         }
 
-        if (password.isEmpty()) {
-            binding.passwordEditTextLayout.error = "Password cannot be empty"
+        if (password.isEmpty() || password.length < 8) {
+            binding.passwordEditTextLayout.error = "Password cannot be empty or less than 8 characters long"
             isValid = false
         }
 

@@ -79,8 +79,8 @@ class RegisterActivity : AppCompatActivity() {
             isValid = false
         }
 
-        if (password.isEmpty()) {
-            binding.passwordEditTextLayout.error = "Password cannot be empty"
+        if (password.isEmpty() || password.length < 8) {
+            binding.passwordEditTextLayout.error = "Password cannot be empty or less than 8 characters long"
             isValid = false
         }
 
@@ -96,6 +96,8 @@ class RegisterActivity : AppCompatActivity() {
                     finish()
                 } else {
                     Toast.makeText(this, response.message, Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, LoginActivity::class.java))
+                    finish()
                 }
             }.onFailure { exception ->
                 Toast.makeText(this, "Registration failed: ${exception.message}", Toast.LENGTH_SHORT).show()

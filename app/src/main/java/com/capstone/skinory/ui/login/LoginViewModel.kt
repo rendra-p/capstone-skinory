@@ -33,10 +33,11 @@ class LoginViewModel(private val repository: DataRepository, private val tokenDa
                 result.onSuccess { response ->
                     response.loginResult?.token?.let { token ->
                         tokenDataStore.saveToken(token)
-                        checkProfile(token)
-                    }
-                    response.loginResult?.userId?.let { userId ->
-                        userPreferences.saveUserId(userId)
+
+                        response.loginResult.userId?.let { userId ->
+                            userPreferences.saveUserId(userId)
+                            checkProfile(token)
+                        }
                     }
                 }
             } catch (e: Exception) {

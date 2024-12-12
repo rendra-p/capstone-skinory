@@ -11,6 +11,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
@@ -102,15 +103,22 @@ class AnalysisActivity : AppCompatActivity() {
         }
     }
 
-    @SuppressLint("SimpleDateFormat")
+    @SuppressLint("SimpleDateFormat", "SetWorldReadable")
     private fun createImageFile(): File? {
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(
-            "JPEG_$timeStamp",
-            ".jpg",
-            storageDir
-        )
+        return try {
+            File.createTempFile(
+                "JPEG_$timeStamp",
+                ".jpg",
+                storageDir
+            ).apply {
+                setReadable(true, false)
+            }
+        } catch (e: IOException) {
+            Log.e("CreateImageFile", "Error creating image file", e)
+            null
+        }
     }
 
     private fun openGallery() {
@@ -194,7 +202,17 @@ class AnalysisActivity : AppCompatActivity() {
         binding.btnAnalysis.isEnabled = false
 
         val file = imageUri?.let { uri ->
-            File(getRealPathFromURI(uri) ?: return@let null)
+            try {
+                val inputStream = contentResolver.openInputStream(uri)
+                val tempFile = File.createTempFile("captured_image", ".jpg", cacheDir)
+                tempFile.outputStream().use { fileOut ->
+                    inputStream?.copyTo(fileOut)
+                }
+                tempFile
+            } catch (e: Exception) {
+                Log.e("UploadImage", "Error creating temp file", e)
+                null
+            }
         }
 
         if (file == null) {
@@ -203,6 +221,9 @@ class AnalysisActivity : AppCompatActivity() {
             binding.btnAnalysis.isEnabled = true
             return
         }
+
+        Log.d("UploadImage", "File path: ${file.absolutePath}")
+        Log.d("UploadImage", "File exists: ${file.exists()}")
 
         val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
         val body = MultipartBody.Part.createFormData("image", file.name, requestFile)
@@ -237,18 +258,10 @@ class AnalysisActivity : AppCompatActivity() {
                     }
 
                     Toast.makeText(this@AnalysisActivity, errorMessage, Toast.LENGTH_LONG).show()
+
+                    Log.e("UploadImage", "Upload error", e)
                 }
             }
-        }
-    }
-
-    private fun getRealPathFromURI(uri: Uri): String? {
-        val projection = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor = contentResolver.query(uri, projection, null, null, null)
-        return cursor?.use {
-            val columnIndex = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-            it.moveToFirst()
-            it.getString(columnIndex)
         }
     }
 

@@ -20,6 +20,7 @@
 
     <application
         android:allowBackup="true"
+        android:requestLegacyExternalStorage="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:foregroundServiceType="dataSync"
         android:fullBackupContent="@xml/backup_rules"

@@ -43,7 +43,7 @@
     <string name="title_time">Usage Time</string>
     <string name="info_notification">To activate the notification turn on the switch button.</string>
     <string name="title_switch">Notifications (Day and Night)</string>
-    <string name="title_chose">Please chose time schedule.</string>
+    <string name="title_chose">Please choose time schedule.</string>
     <string name="day">Day</string>
     <string name="night">Night</string>
     <string name="info_note_select">Note: Clicking item product will automatically save it</string>

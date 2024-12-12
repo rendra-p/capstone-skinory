@@ -24,7 +24,7 @@ class SelectProductActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySelectProductBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        supportActionBar?.title = "Chose Product"
+        supportActionBar?.title = "Choose Product"
 
         tokenDataStore = TokenDataStore.getInstance(this)
 

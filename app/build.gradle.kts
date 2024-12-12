@@ -17,7 +17,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "API_URL", "\"http://34.128.117.197:5000/\"")
+        buildConfigField("String", "API_URL", "\"https://api-service-73534742287.asia-southeast2.run.app/\"")
         buildConfigField("String", "API_NEWS", "\"https://newsapi.org/v2/\"")
         buildConfigField("String", "API_NEWS_KEY", "\"${project.findProperty("API_NEWS_KEY")}\"")
         buildConfigField("String", "API_MODEL", "\"https://ml-73534742287.asia-southeast2.run.app/\"")
